@@ -1,21 +1,23 @@
-import { formatDate } from "../utils/formatDate";
-import { formatSalary } from "../utils/formatSalary";
-import { getStatusColor } from "../utils/getStatusColor";
-
-import axios from 'axios';
+import { Link, useNavigate } from "react-router";
 import { toast } from 'react-hot-toast';
+import { Trash2, ExternalLink, Briefcase, MapPin, Calendar } from 'lucide-react';
 
-import { Trash2, ExternalLink, Briefcase, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { formatDate, formatSalary, getStatusColor } from "../lib/utils";
 
-export const JobCard = ({ job }) => {
+import api from '../lib/axios';
+
+export const JobCard = ({ job, jobs, setJobs }) => {
+
+    const navigate = useNavigate();
 
     const handleDelete = async (id) => {
-
-        if (!window.confirm("Are you sure you want to delete this application?")) return;
+        if (!window.confirm("Are you sure you want to delete this application ?")) return;
 
         try {
-            await axios.delete(`/api/jobs/${id}`);
+            await api.delete(`/jobs/${id}`);
             toast.success('Application deleted successfully');
+            setJobs((prev) => prev.filter((job) => job._id !== id)); // get rid of the deleted one
+            navigate("/");
         } catch (error) {
             toast.error('Error deleting application:', error);
             console.error('Error deleting application:', error);
@@ -55,7 +57,7 @@ export const JobCard = ({ job }) => {
                 )}
             </td>
             <td>
-                <span className={`badge ${getStatusColor(job.status)} badge-lg`}>
+                <span className={`badge h-full text-center ${getStatusColor(job.status)} badge-lg`}>
                 {job.status}
                 </span>
             </td>
@@ -63,7 +65,6 @@ export const JobCard = ({ job }) => {
             <td>
                 {job.salary && (
                     <div className="flex items-center gap-1 text-sm">
-                        <DollarSign size={16} />
                         {formatSalary(job.salary)}
                     </div>
                 )}
@@ -71,11 +72,13 @@ export const JobCard = ({ job }) => {
 
             <td>
                 <div className="flex gap-2">
-                    <button className="btn btn-primary btn-sm" onClick={() => onGoTo(job._id)}>
+                    <Link to={`/jobs/${job._id}`}>
+                    <button className="btn btn-primary btn-sm" onClick={() => handleGoTo(job._id)}>
                         <ExternalLink size={16} /> View
                     </button>
-                    <button className="btn btn-error btn-sm" onClick={handleDelete(job._id)}>
-                        <Trash2 size={16} />
+                    </Link>
+                    <button className="btn btn-error btn-sm" onClick={() => handleDelete(job._id)}>
+                        <Trash2 size={16} /> Delete
                     </button>
                 </div>
             </td>

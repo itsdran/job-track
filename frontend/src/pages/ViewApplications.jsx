@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { OctagonMinus, Briefcase } from 'lucide-react';
+import { Link } from 'react-router';
+import { OctagonMinus, Briefcase, Plus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import api from '../lib/axios';
 
 import { JobCard } from '../components/JobCard';
 
@@ -15,7 +16,7 @@ const ViewApplications = () => {
 useEffect(() => {
     const fetchJobs = async () => {
         try {
-            const res = await axios.get("http://localhost:5001/api/jobs");
+            const res = await api.get("/jobs");
             setJobs(res.data);
             console.log("Jobs Set in useEffect:", res.data);
             setIsRateLimited(false);
@@ -63,11 +64,12 @@ return (
         </div>
 
       {/* Stats */}
-        <div className="stats stats-vertical lg:stats-horizontal shadow mb-6 w-full">
+        <div className="grid grid-cols-3 gap-4 shadow mb-6 w-full">
             <div className="stat">
                 <div className="stat-title">Total Applications</div>
                 <div className="stat-value text-primary">{jobs.length}</div>
             </div>
+
             <div className="stat">
                 <div className="stat-title">In Progress</div>
                 <div className="stat-value text-secondary">
@@ -81,6 +83,13 @@ return (
                     {jobs.filter(j => j.status === 'Hired').length}
                 </div>
             </div>
+        </div>
+
+        <div className="mb-4 text-right">
+            <Link to="/record" className="btn btn-success btn-sm text-white">
+                <Plus size={24} />
+                Add New Job Application
+            </Link>
         </div>
 
         {/* Filters */}
@@ -126,8 +135,10 @@ return (
                 ) : (
                     filteredJobs.map(job => (
                         <JobCard 
-                            key={job.id} 
+                            key={job._id} 
                             job={job}
+                            jobs={jobs}
+                            setJobs={setJobs}
                         />
                 ))
                 )}

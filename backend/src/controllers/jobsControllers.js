@@ -2,7 +2,7 @@ import Job from '../models/Job.js';
 
 export async function getAllJobs (req, res) {
     try {
-        const jobs = await Job.find().sort({ createdAt: -1 });
+        const jobs = await Job.find().sort({ date_applied: -1 });
         res.status(200).json(jobs);
     } catch (error) {
         console.error("Error fetching job applications:", error);
