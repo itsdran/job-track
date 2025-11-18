@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from 'react-hot-toast';
 import { Trash2, ExternalLink, Briefcase, MapPin, Calendar } from 'lucide-react';
 
@@ -6,13 +6,12 @@ import { formatDate, formatSalary, getStatusColor } from "../lib/utils";
 
 import api from '../lib/axios';
 
-export const JobCard = ({ job, jobs, setJobs }) => {
+export const JobCard = ({ job, _, setJobs }) => {
 
     const navigate = useNavigate();
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this application ?")) return;
-
+        if (!window.confirm("Are you sure you want to delete this application?")) return;
         try {
             await api.delete(`/jobs/${id}`);
             toast.success('Application deleted successfully');
@@ -23,6 +22,10 @@ export const JobCard = ({ job, jobs, setJobs }) => {
             console.error('Error deleting application:', error);
         }
     }; 
+
+    const handleGoTo = (id) => {
+        navigate(`/jobs/${id}`);
+    }
 
     return (
         <tr className="hover">
@@ -72,11 +75,9 @@ export const JobCard = ({ job, jobs, setJobs }) => {
 
             <td>
                 <div className="flex gap-2">
-                    <Link to={`/jobs/${job._id}`}>
                     <button className="btn btn-primary btn-sm" onClick={() => handleGoTo(job._id)}>
                         <ExternalLink size={16} /> View
                     </button>
-                    </Link>
                     <button className="btn btn-error btn-sm" onClick={() => handleDelete(job._id)}>
                         <Trash2 size={16} /> Delete
                     </button>

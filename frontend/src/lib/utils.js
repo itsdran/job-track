@@ -19,9 +19,17 @@ export function formatSalary (salary) {
 };
 
 export function formatDate (date) {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('en-PH', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
     });
 };
+
+export function formatDateInput (date) {
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+}

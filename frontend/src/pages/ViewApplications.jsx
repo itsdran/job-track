@@ -59,8 +59,8 @@ return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
         <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Dran's Job Tracker</h1>
-            <p className="text-base-content/70">Job Hunting so tuff you have to track 'em! :P</p>
+            <h1 className="text-4xl font-bold mb-2">Job Tracker</h1>
+            <p className="text-base-content/70">Job Hunting so tuff you have to track 'em!</p>
         </div>
 
       {/* Stats */}
