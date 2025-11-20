@@ -18,7 +18,6 @@ useEffect(() => {
         try {
             const res = await api.get("/jobs");
             setJobs(res.data);
-            console.log("Jobs Set in useEffect:", res.data);
             setIsRateLimited(false);
             setLoading(false);
         } catch (error) {

@@ -55,15 +55,27 @@ const SignupPage = () => {
             return;
         }
 
+        isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
+        if (isExistingAccount) {
+            toast.error('An account with this email or username already exists');
+            return;
+        }
+
         if (formData.password !== formData.confirm_password) {
             toast.error('Passwords do not match');
             return;
         }
 
-        if (formData.password.length < 12) {
-            toast.error('Password must be at least 12 characters long');
+        const strongPasswordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+        if (!strongPasswordRegex.test(formData.password)) {
+            toast.error('Password must be at least 12 characters and include uppercase, lowercase, number, and symbol.');
             return;
         }
+
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        formData.password = hashedPassword;
 
         setLoading(true);
 

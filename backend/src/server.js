@@ -4,7 +4,7 @@ import cors from "cors";
 import path from "path";
 
 import userRoutes from "./routes/userRoutes.js";
-import jobsRoutes from "./routes/jobsRoutes.js";1
+import jobsRoutes from "./routes/jobsRoutes.js";
 import connectDB from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 
@@ -29,8 +29,8 @@ app.use ((req, res, next) => {
   next();
 });
 
-app.use("/api/users", userRoutes);
-app.use("/api/:id/jobs", jobsRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/jobs", jobsRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/dist')));

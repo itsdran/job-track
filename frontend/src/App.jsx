@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router';
 import SignUp from './pages/SignUp';
+import LogIn from './pages/LogIn';
 import ViewApplications from './pages/ViewApplications';
 import RecordJobApplication from './pages/RecordJobApplication';
 import ViewJob from './pages/JobDetail';
@@ -12,10 +13,11 @@ function App() {
       <Toaster position="top-center" />
 
       <Routes>
+        <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/users/:id" element={<ViewApplications />} />
-        <Route path="/record" element={<RecordJobApplication />} />
-        <Route path="jobs/:id" element={<ViewJob />} />
+        <Route path="user/:user_id" element={<ViewApplications />} />
+        <Route path="user/:user_id/record" element={<RecordJobApplication />} />
+        <Route path="user/:user_id/:job_id" element={<ViewJob />} />
       </Routes>
     </>
   )

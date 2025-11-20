@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
 
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
@@ -11,7 +12,20 @@ export async function getAllUsers (req, res) {
     }
 } 
 
-export async function createUser (req, res) {
+export async function getUserByID (req, res) {
+    try {
+        const user = await User.findById(req.params.id);
+        
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.status(200).json(user);
+
+    } catch (error) {
+        console.error("Error fetching user account by ID:", error);
+        res.status(500).json({ error: "Internal Server Error" });        
+    }
+}
+
+export async function signUpUser (req, res) {
     try {
         const { first_name, last_name, username, password, 
             email, phone_number, job_applying_for, 
@@ -32,17 +46,33 @@ export async function createUser (req, res) {
     }
 } 
 
-export async function getUserByID (req, res) {
+export async function logInUser (req, res) {
     try {
-        const user = await User.findById(req.params.id);
-        
-        if (!user) return res.status(404).json({ error: "User not found" });
-        res.status(200).json(user);
+        const { identifier, password } = req.body;
+
+        const user = await User.findOne({ 
+                    $or: [{ email: identifier }, { username: identifier }] 
+                });
+
+        if (!user) return res.status(400).json({ message: "User not found" });
+
+        //const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = password === user.password;
+        if (!isMatch) {
+            console.error("Invalid email or password");
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+        console.log("Successful login!");
+        res.status(200).json({ 
+            message: "Login successful",
+            userId: user._id,
+            username: user.username
+        });
 
     } catch (error) {
-        console.error("Error fetching user account by ID:", error);
+        console.error("Error logging in:", error);
         res.status(500).json({ error: "Internal Server Error" });        
-    }
+    } 
 }
 
 export async function updateUser (req, res) {
