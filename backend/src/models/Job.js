@@ -2,6 +2,11 @@ import moose from 'mongoose';
 
 const jobSchema = new moose.Schema(
     {
+        applied_by: {
+        type: moose.Schema.Types.ObjectId,
+        ref: "User",
+        required: false
+        },
         position: {
             type: String,
             required: true
