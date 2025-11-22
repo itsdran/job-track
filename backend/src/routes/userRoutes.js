@@ -1,14 +1,20 @@
 import express from "express";
-import { getAllUsers, signUpUser, logInUser, getUserByID, updateUser, deleteUser } from "../controllers/usersControllers.js";
+import {  getAllUsers,  signUpUser, logInUser, getUserByID, getUserByUN, updateUser, deleteUser } from "../controllers/usersControllers.js";
 
-const router = express.Router(); 
+import { getAllJobsFromUser } from "../controllers/jobsControllers.js";
 
-router.get("/", getAllUsers); // For testing purpose only
-router.get ("/:id", getUserByID)
-router.put ("/:id", updateUser);
-router.delete ("/:id", deleteUser);
+const router = express.Router();
 
-router.post ("/signup", signUpUser);
-router.post ("/login", logInUser); 
+router.post("/signup", signUpUser);
+router.post("/login", logInUser);
+
+router.get("/", getAllUsers); // testing purpose only
+router.get("/:username", getUserByUN);
+router.get("/:id", getUserByID);
+
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
+
+router.get("/:username/jobs", getAllJobsFromUser);
 
 export default router;

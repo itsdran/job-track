@@ -1,25 +1,44 @@
 import Job from '../models/Job.js';
+import User from '../models/User.js'
 
-export async function getAllJobs (req, res) {
+export async function getAllJobsFromUser(req, res) {
     try {
-        const jobs = await Job.find().populate("applied_by").sort({ date_applied: -1 });
-        res.status(200).json(jobs);
+        const user = await User.findOne({ username: req.params.username });
+
+        if (!user)  return res.status(404).json({ message: "User not found" });
+
+        const jobs = await Job.find({ applied_by: user._id }).populate("applied_by").sort({ date_applied: -1 });
+
+        return res.status(200).json(jobs);
     } catch (error) {
         console.error("Error fetching job applications:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
-} 
+}
+
+export async function getAllJobs(_, res) {
+    try {
+        const jobs = await Job.find().populate("applied_by").sort({ date_applied: -1 });
+
+        return res.status(200).json(jobs);
+    } catch (error) {
+        console.error("Error fetching job applications:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
 
 export async function addJob (req, res) {
     try {
+        const user = await User.findOne({ username: req.params.username });
+
         const { position, company, application_platform, date_applied, 
-            location, setup, description, salary, status } = req.body;
+            location, setup, description, salary, status, applied_by } = req.body;
         const newJob = new Job (
             { position, company, application_platform, date_applied, 
-            location, setup, description, salary, status } );
+            location, setup, description, salary, status, applied_by } );
 
         await newJob.save();
-        res.status(201).json({message: "New job application recorded successfully"});
+        return res.status(201).json({message: "New job application recorded successfully"}, user);
 
     } catch (error) {
         console.error("Error recording a new job applications:", error);
@@ -32,7 +51,7 @@ export async function getJobByID (req, res) {
         const job = await Job.findById(req.params.id);
         
         if (!job) return res.status(404).json({ error: "Job application not found" });
-        res.status(200).json(job);
+        job.status(200).json(job);
 
     } catch (error) {
         console.error("Error fetching job application by ID:", error);

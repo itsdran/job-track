@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { Link, useNavigate, useParams } from "react-router";
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from "react-router";
 import { toast } from 'react-hot-toast';
-import { Briefcase, Building2, MapPin, DollarSign, FileText, Calendar, Laptop } from 'lucide-react';
+import { Briefcase, Building2, MapPin, FileText, Calendar, Laptop } from 'lucide-react';
 
 import { platforms } from '../constants/platforms';
 import { setups } from '../constants/setups';
 import { statuses } from '../constants/statuses';
 
-import axios from '../lib/axios';
+import api from '../lib/axios';
 
-const CreateJobApplication = () => {
-
-    const navigate = useNavigate();
-    
+const RecordJobApplication = () => {
+    const { username } = useParams();
+    const [userID, setUserID] = useState();
+    const navigate = useNavigate();   
     const [formData, setFormData] = useState({
         position: '',
         company: '',
@@ -22,7 +22,8 @@ const CreateJobApplication = () => {
         setup: '',
         description: '',
         salary: '',
-        status: 'Applied'
+        status: 'Applied',
+        applied_by: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -34,6 +35,20 @@ const CreateJobApplication = () => {
         [name]: value
         }));
     };
+
+    // Get User info from username
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await api.get(`/users/${username}`);
+                setUserID(res.data._id);
+                console.log("User ID: ", userID);
+            } catch (error) {
+                console.error("Error fetching user:", error);
+            }
+        };
+        fetchUser();
+    }, [username]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,15 +63,15 @@ const CreateJobApplication = () => {
         setLoading(true);
 
         try {
-        // Prepare data for submission
             const submitData = {
                 ...formData,
+                applied_by: userID,
                 salary: formData.salary ? Number(formData.salary) : undefined
             };
 
-            await axios.post('/jobs', submitData);
+            await api.post('/jobs', submitData);
             toast.success('Job application added successfully!');
-            navigate('/');
+            navigate(`/users/${username}/jobs/record`);
 
             // Reset form
             setFormData({
@@ -68,7 +83,8 @@ const CreateJobApplication = () => {
                 setup: '',
                 description: '',
                 salary: '',
-                status: 'Applied'
+                status: 'Applied',
+                applied_by: ''
             });
 
         } catch (error) {
@@ -94,6 +110,7 @@ const CreateJobApplication = () => {
                 status: 'Applied'
             });
         }
+        navigate(`/${user.username}`);
     };
 
     return (
@@ -196,7 +213,7 @@ const CreateJobApplication = () => {
                         Application Platform
                     </span>
                     </label>
-                    <select
+                    <select required
                     name="application_platform"
                     className="select select-bordered"
                     value={formData.application_platform}
@@ -317,4 +334,4 @@ const CreateJobApplication = () => {
     );
 };
 
-export default CreateJobApplication;
+export default RecordJobApplication;

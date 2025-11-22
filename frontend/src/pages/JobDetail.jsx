@@ -33,7 +33,7 @@ const JobDetail = () => {
     useEffect(() => {
         const fetchJob = async () => {
             try {
-                const res = await api.get(`/jobs/${id}`);
+                const res = await api.get(`/user/${user.username}`);
                 setFormData(res.data);
                 setIsRateLimited(false);
             } catch (error) {

@@ -29,7 +29,7 @@ app.use ((req, res, next) => {
   next();
 });
 
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobsRoutes);
 
 if (process.env.NODE_ENV === 'production') {

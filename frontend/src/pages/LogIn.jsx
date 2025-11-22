@@ -32,9 +32,9 @@ const LoginPage = () => {
 
         try {
             console.log('Submitting login with data:', formData);
-            const res = await axios.post("/user/login", formData);
+            const res = await axios.post("/users/login", formData);
             toast.success('Login successfully! Redirecting...');
-            navigate(`/user/${res.data.username}`);
+            navigate(`/users/${res.data.username}/jobs`);
         } catch (error) {
             toast.error('Error logging in. Please try again.');
             console.error('Login error:', error);

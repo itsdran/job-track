@@ -13,11 +13,12 @@ function App() {
       <Toaster position="top-center" />
 
       <Routes>
+        <Route path="/" element={<LogIn />} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="user/:user_id" element={<ViewApplications />} />
-        <Route path="user/:user_id/record" element={<RecordJobApplication />} />
-        <Route path="user/:user_id/:job_id" element={<ViewJob />} />
+        <Route path="users/:username/jobs" element={<ViewApplications />} />
+        <Route path="users/:username/jobs/record" element={<RecordJobApplication />} />
+        <Route path="users/:username/jobs/:job_id" element={<ViewJob />} />
       </Routes>
     </>
   )
