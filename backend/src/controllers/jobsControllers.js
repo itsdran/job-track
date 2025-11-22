@@ -38,7 +38,7 @@ export async function addJob (req, res) {
             location, setup, description, salary, status, applied_by } );
 
         await newJob.save();
-        return res.status(201).json({message: "New job application recorded successfully"}, user);
+        return res.status(201).json({message: "New job application recorded successfully"});
 
     } catch (error) {
         console.error("Error recording a new job applications:", error);

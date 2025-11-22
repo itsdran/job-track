@@ -110,7 +110,7 @@ const RecordJobApplication = () => {
                 status: 'Applied'
             });
         }
-        navigate(`/${user.username}`);
+        navigate(`/users/${username}/jobs`);
     };
 
     return (
