@@ -6,7 +6,7 @@ import { formatDate, formatSalary, getStatusColor } from "../lib/utils";
 
 import api from '../lib/axios';
 
-export const JobCard = ({ job, _, setJobs }) => {
+export const JobCard = ({ job, _, username, setJobs }) => {
 
     const navigate = useNavigate();
 
@@ -16,7 +16,6 @@ export const JobCard = ({ job, _, setJobs }) => {
             await api.delete(`/jobs/${id}`);
             toast.success('Application deleted successfully');
             setJobs((prev) => prev.filter((job) => job._id !== id)); // get rid of the deleted one
-            navigate("/");
         } catch (error) {
             toast.error('Error deleting application:', error);
             console.error('Error deleting application:', error);
@@ -24,7 +23,7 @@ export const JobCard = ({ job, _, setJobs }) => {
     }; 
 
     const handleGoTo = (id) => {
-        navigate(`/jobs/${id}`);
+        navigate(`/users/${username}/jobs/${id}`);
     }
 
     return (

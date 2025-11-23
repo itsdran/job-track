@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { toast } from 'react-hot-toast';
-import { Briefcase, Building2, Trash2, ArrowLeft, MapPin, FileText, Calendar, Laptop, Pen} from 'lucide-react';
 
+import { Briefcase, Building2, Trash2, ArrowLeft, MapPin, FileText, Calendar, Laptop, Pen} from 'lucide-react';
 import { platforms } from '../constants/platforms';
 import { setups } from '../constants/setups';
 import { statuses } from '../constants/statuses';
 
 import api from '../lib/axios';
-import { formatDateInput } from '../lib/utils';
+import { formatDateInput, formatSalary } from '../lib/utils.js';
 
 import RateLimitedUI from '../components/RateLimited';
 
 const JobDetail = () => {
 
-    const { id } = useParams();
+    const { username, job_id } = useParams();
+
     const [formData, setFormData] = useState({
+        applied_by: '',
         position: '',
         company: '',
         application_platform: '',
@@ -24,8 +26,9 @@ const JobDetail = () => {
         setup: '',
         description: '',
         salary: '',
-        status: 'Applied'
+        status: ''
     });
+
     const [isRateLimited, setIsRateLimited] = useState(false);
     const [saving, setSaving] = useState(true);
     const navigate = useNavigate();
@@ -33,7 +36,7 @@ const JobDetail = () => {
     useEffect(() => {
         const fetchJob = async () => {
             try {
-                const res = await api.get(`/user/${user.username}`);
+                const res = await api.get(`/jobs/${job_id}`);
                 setFormData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
@@ -48,7 +51,7 @@ const JobDetail = () => {
             }
         }
         fetchJob();
-    }, []);
+    }, [job_id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -84,7 +87,7 @@ const JobDetail = () => {
 
     const handleCancel = () => {
         if (window.confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
-            navigate ("/");
+            navigate (`/users/${username}/jobs`);
         }
     };
 
@@ -252,7 +255,7 @@ const JobDetail = () => {
                     name="salary"
                     placeholder="e.g., 25000"
                     className="input input-bordered"
-                    value={formData.salary}
+                    value={formatSalary(formData.salary)}
                     onChange={handleChange}
                     min="0"
                     />

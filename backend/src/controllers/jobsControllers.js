@@ -1,7 +1,7 @@
 import Job from '../models/Job.js';
 import User from '../models/User.js'
 
-export async function getAllJobsFromUser(req, res) {
+export async function getAllJobsFromUserID(req, res) {
     try {
         const user = await User.findOne({ username: req.params.username });
 
@@ -51,7 +51,7 @@ export async function getJobByID (req, res) {
         const job = await Job.findById(req.params.id);
         
         if (!job) return res.status(404).json({ error: "Job application not found" });
-        job.status(200).json(job);
+        res.status(200).json(job);
 
     } catch (error) {
         console.error("Error fetching job application by ID:", error);

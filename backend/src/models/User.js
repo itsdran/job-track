@@ -3,94 +3,83 @@ import moose from 'mongoose';
 const userSchema = new moose.Schema(
     {
         first_name: {
-        type: String,
-        required: true,
-        trim: true,
-
+            type: String,
+            required: true,
+            trim: true,
         },
         last_name: {
-        type: String,
-        required: true,
-        trim: true,
+            type: String,
+            required: true,
+            trim: true,
         },
-
         username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
         },
-
         password: {
-        type: String,
-        required: true,
-        minlength: 6,
+            type: String,
+            required: true,
+            minlength: 12,
         },
-
         email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
         },
-
         phone_number: {
-        type: String,
-        default: ""
+            type: String,
+            default: ""
         },
-
         job_applying_for: {
-        type: String,
-        default: "",
-        trim: true
+            type: String,
+            default: "",
+            trim: true
         },
-
         location_preference: {
-        type: String,
-        default: "",
-        trim: true
+            type: String,
+            default: "",
+            trim: true
         },
-
         setup_preference: {
             type: String,
             enum: ['Remote', 'On-site', 'Hybrid']
         },
-
         salary_expectation: {
-        type: Number,
-        default: null
+            type: Number,
+            default: null
         },        
-        
         profile_summary: {
-        type: String,
-        maxlength: 500,
-        default: ""
+            type: String,
+            maxlength: 1000,
+            default: ""
         },
-
         skills: {
-        type: [String],
-        default: []
+            type: [String],
+            default: []
         },
-
         portfolio_link: {
-        type: String,
-        default: ""
+            type: String,
+            default: ""
         },
-
         linkedin_url: {
-        type: String,
-        default: ""
+            type: String,
+            default: ""
         },
-
         resume_cv: {
-        type: String, 
-        default: "", 
+            type: String, 
+            default: "", 
         },
-
+        profile: {
+            type: String,
+            default: ""
+        },
         isActive: {
-        type: Boolean,
-        default: true
+            type: Boolean,
+            default: true
         }
     },
 

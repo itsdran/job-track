@@ -10,7 +10,7 @@ export function getStatusColor (status) {
 };
 
 export function formatSalary (salary) {
-    if (!salary) return 'Not specified';
+    if (!salary) return '0';
     return new Intl.NumberFormat('en-PH', {
         style: 'currency',
         currency: 'PHP',

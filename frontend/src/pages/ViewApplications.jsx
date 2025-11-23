@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import api from '../lib/axios';
 
 import { JobCard } from '../components/JobCard';
+import { Header } from '../components/Header';
 import { statuses } from "../constants/statuses.js"
 
 const ViewApplications = () => {
@@ -56,107 +57,106 @@ const ViewApplications = () => {
     }
 
     return (
-        <div className="container mx-auto p-6 max-w-7xl">
-        {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold mb-2">Job Tracker</h1>
-                <p className="text-base-content/70">Job Hunting so tuff you have to track 'em!</p>
-            </div>
+        <>
+            <Header />
+            <div className="container mx-auto p-6 max-w-7xl">
 
-        {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 shadow mb-6 w-full">
-                <div className="stat">
-                    <div className="stat-title">Total Applications</div>
-                    <div className="stat-value text-primary">{jobs.length}</div>
-                </div>
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4 shadow mb-6 w-full">
+                    <div className="stat">
+                        <div className="stat-title">Total Applications</div>
+                        <div className="stat-value text-primary">{jobs.length}</div>
+                    </div>
 
-                <div className="stat">
-                    <div className="stat-title">In Progress</div>
-                    <div className="stat-value text-secondary">
-                        {jobs.filter(j => j.status === 'First Interview' || j.status === 'For Final Interview').length}
+                    <div className="stat">
+                        <div className="stat-title">In Progress</div>
+                        <div className="stat-value text-secondary">
+                            {jobs.filter(j => j.status === 'First Interview' || j.status === 'For Final Interview').length}
+                        </div>
+                    </div>
+
+                    <div className="stat">
+                        <div className="stat-title">Hired</div>
+                        <div className="stat-value text-success">
+                            {jobs.filter(j => j.status === 'Hired').length}
+                        </div>
                     </div>
                 </div>
 
-                <div className="stat">
-                    <div className="stat-title">Hired</div>
-                    <div className="stat-value text-success">
-                        {jobs.filter(j => j.status === 'Hired').length}
+                <div className="mb-4 text-right">
+                    <Link to={`/users/${username}/jobs/record`} className="btn btn-success btn-sm text-white">
+                        <Plus size={24} />
+                        Add New Job Application
+                    </Link>
+                </div>
+
+                {/* Filters */}
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                    <input type="text" placeholder="Search by position, company, or location..." className="input input-bordered flex-1" value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}/>
+                    <div className="flex gap-2 flex-wrap">
+                        {statuses.map(status => (
+                            <button
+                            key={status}
+                            className={`btn btn-sm ${filter === status ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => setFilter(status)}
+                            >
+                            {status}
+                            </button>
+                        ))}
                     </div>
                 </div>
-            </div>
 
-            <div className="mb-4 text-right">
-                <Link to={`/users/${username}/jobs/record`} className="btn btn-success btn-sm text-white">
-                    <Plus size={24} />
-                    Add New Job Application
-                </Link>
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <input type="text" placeholder="Search by position, company, or location..." className="input input-bordered flex-1" value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}/>
-                <div className="flex gap-2 flex-wrap">
-                    {statuses.map(status => (
-                        <button
-                        key={status}
-                        className={`btn btn-sm ${filter === status ? 'btn-primary' : 'btn-ghost'}`}
-                        onClick={() => setFilter(status)}
-                        >
-                        {status}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto bg-base-100 rounded-lg shadow">
-                <table className="table table-lg">
-                <thead>
-                    <tr>
-                        <th>Position</th>
-                        <th>Company</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Salary</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredJobs.length === 0 ? (
-                    <tr>
-                        <td colSpan="6" className="text-center py-8">
-                            <div className="flex flex-col items-center gap-2">
-                                <Briefcase size={48} className="opacity-30" />
-                                <p className="text-lg">No applications found</p>
-                            </div>
-                        </td>
-                    </tr>
-                    ) : (
-                        filteredJobs.map(job => (
-                            <JobCard 
-                                key={job._id} 
-                                job={job}
-                                jobs={jobs}
-                                setJobs={setJobs}
-                            />
-                    ))
-                    )}
-
-                    {isRateLimited && (
+                {/* Table */}
+                <div className="overflow-x-auto bg-base-100 rounded-lg shadow">
+                    <table className="table table-lg">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Company</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Salary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredJobs.length === 0 ? (
                         <tr>
                             <td colSpan="6" className="text-center py-8">
                                 <div className="flex flex-col items-center gap-2">
-                                    <OctagonMinus size={48} className="opacity-30" />
-                                    <p className="text-lg">You've made too many requests in a short period. Please wait a moment.</p>
+                                    <Briefcase size={48} className="opacity-30" />
+                                    <p className="text-lg">No applications found</p>
                                 </div>
                             </td>
                         </tr>
-                    )}
-                </tbody>
-                </table>
+                        ) : (
+                            filteredJobs.map(job => (
+                                <JobCard 
+                                    key={job._id} 
+                                    job={job}
+                                    jobs={jobs}
+                                    username={username}
+                                    setJobs={setJobs}
+                                />
+                        ))
+                        )}
+
+                        {isRateLimited && (
+                            <tr>
+                                <td colSpan="6" className="text-center py-8">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <OctagonMinus size={48} className="opacity-30" />
+                                        <p className="text-lg">You've made too many requests in a short period. Please wait a moment.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                    </table>
+                </div>
             </div>
-            </div>
+        </>
         );
 };
 

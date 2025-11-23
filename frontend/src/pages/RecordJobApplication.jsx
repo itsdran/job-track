@@ -42,7 +42,6 @@ const RecordJobApplication = () => {
             try {
                 const res = await api.get(`/users/${username}`);
                 setUserID(res.data._id);
-                console.log("User ID: ", userID);
             } catch (error) {
                 console.error("Error fetching user:", error);
             }
@@ -71,7 +70,7 @@ const RecordJobApplication = () => {
 
             await api.post('/jobs', submitData);
             toast.success('Job application added successfully!');
-            navigate(`/users/${username}/jobs/record`);
+            navigate(`/users/${username}/jobs`);
 
             // Reset form
             setFormData({
