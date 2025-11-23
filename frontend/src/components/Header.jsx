@@ -35,7 +35,7 @@ export const Header = () => {
             </div>
 
             <div className="navbar-end gap-2">
-                <button onClick={() => handleNavigation('/jobs')} className="btn btn-ghost btn-sm">
+                <button onClick={() => handleNavigation('/home')} className="btn btn-ghost btn-sm">
                     <Home size={18} />
                     <span className="hidden md:inline">Home</span>
                 </button>
