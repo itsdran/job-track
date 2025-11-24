@@ -1,7 +1,6 @@
 import User from '../models/User.js';
 import jwt from "jsonwebtoken";
 
-
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
     try {
@@ -72,7 +71,7 @@ export async function logInUser(req, res) {
         if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
 
         const token = jwt.sign(
-            { id: user._id, username: user.username },
+            { id: user._id, username: user.username, first_name: user.first_name },
             process.env.JWT_SECRET || "defaultsecret",
             { expiresIn: "7d" }
         );
@@ -84,7 +83,8 @@ export async function logInUser(req, res) {
             token,
             user: {
                 username: user.username,
-                _id: user._id
+                _id: user._id,
+                first_name: user.first_name
             }
         });
 

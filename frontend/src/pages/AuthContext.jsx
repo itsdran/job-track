@@ -5,14 +5,19 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
+    const [firstName, setFirstName] = useState("");
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         const storedUser = JSON.parse(localStorage.getItem("user"));
-
-        if (storedToken) setToken(storedToken);
-        if (storedUser) setUser(storedUser);
-
+        const storedFirstName = localStorage.getItem("first_name");
+        if (storedToken) 
+        if (storedUser) 
+        if (storedToken && storedUser && storedFirstName) {
+            setToken(storedToken);
+            setUser(storedUser);
+            setFirstName(storedFirstName);
+        }
     }, []);
 
     useEffect(() => {
@@ -35,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token, firstName }}>
             {children}
         </AuthContext.Provider>
     );
