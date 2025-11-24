@@ -8,6 +8,7 @@ import RecordJobApplication from './pages/RecordJobApplication';
 import ViewJob from './pages/JobDetail';
 
 import { Toaster } from 'react-hot-toast';
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   return (
@@ -20,9 +21,20 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<About/>} />
-        <Route path="users/:username/jobs" element={<ViewApplications />} />
-        <Route path="users/:username/jobs/record" element={<RecordJobApplication />} />
-        <Route path="users/:username/jobs/:job_id" element={<ViewJob />} />
+        <Route path="users/:username/jobs" element={
+          <ProtectedRoute>
+            <ViewApplications />
+          </ProtectedRoute>
+          } />
+        <Route path="users/:username/jobs/record" element={
+          <ProtectedRoute>
+            <RecordJobApplication />
+          </ProtectedRoute>
+          } />
+        <Route path="users/:username/jobs/:job_id" element={
+          <ProtectedRoute>
+            <ViewJob />
+          </ProtectedRoute>} />
       </Routes>
     </>
   )

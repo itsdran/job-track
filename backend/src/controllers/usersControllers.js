@@ -1,4 +1,6 @@
 import User from '../models/User.js';
+import jwt from "jsonwebtoken";
+
 
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
@@ -55,33 +57,41 @@ export async function signUpUser (req, res) {
     }
 } 
 
-export async function logInUser (req, res) {
+export async function logInUser(req, res) {
     try {
         const { identifier, password } = req.body;
 
-        const user = await User.findOne({ 
-                    $or: [{ email: identifier }, { username: identifier }] 
-                });
+        const user = await User.findOne({
+            $or: [{ email: identifier }, { username: identifier }]
+        });
 
         if (!user) return res.status(400).json({ message: "User not found" });
 
-        //const isMatch = await bcrypt.compare(password, user.password);
         const isMatch = password === user.password;
-        if (!isMatch) {
-            console.error("Invalid email or password");
-            return res.status(401).json({ error: "Invalid email or password" });
-        }
-        console.log("Successful login!");
-        res.status(200).json({ 
+
+        if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
+
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET || "defaultsecret",
+            { expiresIn: "7d" }
+        );
+
+        res.status(200).json({
             message: "Login successful",
             userId: user._id,
-            username: user.username
+            username: user.username,
+            token,
+            user: {
+                username: user.username,
+                _id: user._id
+            }
         });
 
     } catch (error) {
         console.error("Error logging in:", error);
-        res.status(500).json({ error: "Internal Server Error" });        
-    } 
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 }
 
 export async function updateUser (req, res) {

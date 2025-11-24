@@ -1,23 +1,25 @@
 import { useNavigate, useParams } from 'react-router';
-
+import { useContext } from 'react';
+import { AuthContext } from '../pages/AuthContext';
 import { Briefcase, Home, Info, LogOut, User } from 'lucide-react';
 
 export const Header = () => {
 
     const navigate = useNavigate();
+    const { logout } = useContext(AuthContext);
 
     const user = {
         name: 'Dran',
         initials: 'D',
-        avatar: null // Set to image URL if available
+        avatar: null
     };
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to log out?')) {
-        // TODO: Clear auth token and redirect
-        // localStorage.removeItem('token');
-        // window.location.href = '/login';
-        console.log('Logging out...');
+            localStorage.removeItem('token');
+            logout();
+            navigate("/login");
+            console.log('Logging out...');
         }
     };
 

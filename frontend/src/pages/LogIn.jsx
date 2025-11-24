@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 import axios from '../lib/axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router';
 
+import { AuthContext } from './AuthContext';
+
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         identifier: '',
         password: ''
     });
+
+    const { login } = useContext(AuthContext);
 
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -31,9 +35,12 @@ const LoginPage = () => {
         setLoading(true);
 
         try {
-            console.log('Submitting login with data:', formData);
             const res = await axios.post("/users/login", formData);
+
+            login(res.data.user, res.data.token);
+
             toast.success('Login successfully! Redirecting...');
+        
             navigate(`/users/${res.data.username}/jobs`);
         } catch (error) {
             toast.error('Error logging in. Please try again.');
