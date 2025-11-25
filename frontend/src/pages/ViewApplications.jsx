@@ -20,6 +20,7 @@ const ViewApplications = () => {
     useEffect(() => {
         const fetchJobs = async () => {
             try {                
+                document.title = `Applications`;
                 const res = await api.get(`/users/${username}/jobs`);
                 setJobs(res.data);
                 setIsRateLimited(false);

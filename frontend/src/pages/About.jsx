@@ -6,7 +6,9 @@ import { useEffect } from 'react';
 
 const AboutPage = () => {
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        document.title = 'Job Tracker: About';
+    }, []);
 
     const year = new Date().getFullYear();
 
@@ -27,6 +29,7 @@ const AboutPage = () => {
         { name: 'Tailwind CSS', description: 'Utility-first CSS framework', color: 'badge-primary' },
         { name: 'DaisyUI', description: 'Component library for Tailwind', color: 'badge-secondary' }
     ];
+
 
     return (
         <>

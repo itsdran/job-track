@@ -87,6 +87,14 @@ const ProfilePage = () => {
             toast.success('Profile updated successfully!');
             setIsEditing(false);
         } catch (error) {
+
+            if (error.response && error.response.status === 429) {
+                setIsRateLimited(true);
+                toast.error('You have made too many requests. Please try again later.');
+            } else {
+                toast.error('Error fetching jobs:', error);
+            }
+
             toast.error('Error updating profile');
             console.error('Update error:', error);
         }
