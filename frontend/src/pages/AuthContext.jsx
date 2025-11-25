@@ -21,15 +21,13 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        console.log("Auth State Changed:", { user, token });
-    }, [user, token]);
+    }, [token]);
 
     const login = (user, token) => {
         setUser(user);
         setToken(token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", token);
-        console.log("Currently logged in: ", token);
     };
 
     const logout = () => {

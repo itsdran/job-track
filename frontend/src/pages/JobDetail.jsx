@@ -215,7 +215,7 @@ const JobDetail = () => {
                                     </span>
                                 </label>
                                 <input type="number" name="salary" placeholder="e.g., 25000" className="input input-bordered"
-                                    value={formatSalary(formData.salary)} onChange={handleChange} min="0" />
+                                    value={formData.salary} onChange={handleChange} min="0" />
                             </div>
 
                             <div className="form-control">

@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Generic job operations
 router.post("/", addJob);
-router.get("", getAllJobs);
+router.get("/", getAllJobs);
 router.get("/:id", getJobByID);
 router.put("/:id", updateJob); 
 router.delete("/:id", deleteJob);

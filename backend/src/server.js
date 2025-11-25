@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 
@@ -14,34 +14,30 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
-//Middleware to parse JSON bodies
-app.use(express.json()); 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
+app.use(express.json());
+
 app.use(rateLimiter);
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(cors({
-    origin: 'http://localhost:5173'
-  }));
-}
-
-app.use ((req, res, next) => {
-    console.log(`${req.method} request for '${req.url}' `);
+app.use((req, res, next) => {
+  console.log(`${req.method} request for '${req.url}'`);
   next();
 });
 
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobsRoutes);
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend', 'dist', 'index.html'));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
   });
-} 
+}
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log("Server started on PORT:", PORT);
-  });
+  app.listen(PORT, () => console.log("Server started on PORT:", PORT));
 });

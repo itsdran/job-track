@@ -16,9 +16,9 @@ const RateLimitedUI = () => {
                     </p>
                 </div>
             </div>
-      </div>
+        </div>
     </div>
-  );
+    );
 };
 
 export default RateLimitedUI;

@@ -121,7 +121,7 @@ const ViewApplications = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredJobs.length === 0 ? (
+                        {filteredJobs.length === 0 && !isRateLimited ? (
                         <tr>
                             <td colSpan="6" className="text-center py-8">
                                 <div className="flex flex-col items-center gap-2">

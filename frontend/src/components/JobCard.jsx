@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { toast } from 'react-hot-toast';
 import { Trash2, ExternalLink, Briefcase, MapPin, Calendar } from 'lucide-react';
 
-import { formatDate, formatSalary, getStatusColor } from "../lib/utils";
+import { formatDateInput, formatSalary, getStatusColor } from "../lib/utils";
 
 import api from '../lib/axios';
 
@@ -39,7 +39,7 @@ export const JobCard = ({ job, _, username, setJobs }) => {
                         <div className="font-bold text-lg">{job.position}</div>
                         <div className="text-sm opacity-70 flex items-center gap-1">
                             <Calendar size={14} />
-                            {formatDate(job.date_applied)}
+                            {formatDateInput(job.date_applied)}
                         </div>
                     </div>
                 </div>
