@@ -18,6 +18,7 @@ const jobSchema = new moose.Schema(
         application_platform: {
             type: String,
             enum: ['LinkedIn', 'Indeed', 'Jobslin', 'BossJob', 'Company Website', 'Referral', 'Other'],
+            default: 'LinkedIn'
         },
         date_applied: {
             type: Date,
@@ -29,7 +30,8 @@ const jobSchema = new moose.Schema(
         },
         setup: {
             type: String,
-            enum: ['Remote', 'On-site', 'Hybrid']
+            enum: ['Remote', 'On-site', 'Hybrid'],
+            default: 'On-site'
         },
         description: {
             type: String,
@@ -42,6 +44,11 @@ const jobSchema = new moose.Schema(
             enum: ['Applied', 'First Interview', 'For Final Interview', 'Rejected', 'Hired'],
             default: 'Applied'
         },
+        isActive: {
+            type: Boolean,
+            default:true
+        }
+
     },    
     { timestamps: true }
 );

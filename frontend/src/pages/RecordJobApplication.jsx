@@ -53,7 +53,7 @@ const RecordJobApplication = () => {
         e.preventDefault();
         
         // Basic validation
-        if (!formData.position || !formData.company || !formData.location) {
+        if (!formData.position || !formData.company || !formData.location || !formData.application_platform) {
             toast.error('Please fill in all required fields');
             console.log ('Not all required fields filled');
         return;
@@ -61,11 +61,13 @@ const RecordJobApplication = () => {
 
         setLoading(true);
 
+        //const numeric = formData.salary.replace(/[^0-9]/g, "");
+
         try {
             const submitData = {
                 ...formData,
                 applied_by: userID,
-                salary: formData.salary ? Number(formData.salary) : undefined
+                salary: formData.salary ? formData.salary : undefined
             };
 
             await api.post('/jobs', submitData);

@@ -74,7 +74,7 @@ const JobDetail = () => {
         setSaving(true);
 
         try {
-            await api.put(`/jobs/${id}`, formData);
+            await api.put(`/jobs/${job_id}`, formData);
             toast.success('Application updated successfully');
         } catch (error) {
             toast.error('Error updated application:', error);
@@ -96,237 +96,178 @@ const JobDetail = () => {
         try {
             await api.delete(`/jobs/${id}`);
             toast.success('Application deleted successfully');
-            setJobs((prev) => prev.filter((job) => job._id !== id)); // get rid of the deleted one
-            navigate("/");
+            setFormData((prev) => prev.filter((job) => job._id !== id));
+            navigate(`/users/${username}/jobs`);
         } catch (error) {
-            toast.error('Error deleting application:', error);
             console.error('Error deleting application:', error);
         }
     }; 
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
-        {isRateLimited && <RateLimitedUI />}
-        <div className="mb-6">
-            <Link to="/" className="btn btn-ghost">
-                <ArrowLeft size={20} />
-                Back to Applications
-            </Link>
-        </div>
+            {isRateLimited && <RateLimitedUI />}
+            <div className="mb-6">
+                <Link to={`/users/${username}/jobs`} className="btn btn-ghost">
+                    <ArrowLeft size={20} />
+                    Back to Applications
+                </Link>
+            </div>
 
-        {/* Header */}
-        <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Job Details</h1>
-            <p className="text-base-content/70">{formData.company} | {formData.position}</p>
-        </div>
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-4xl font-bold mb-2">Job Details</h1>
+                <p className="text-base-content/70">{formData.company} | {formData.position}</p>
+            </div>
 
-        {/* Form Card */}
-        <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-            <div onSubmit={handleSubmit}>
-                {/* Row 1: Position & Company */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        <Briefcase className="inline mr-2" size={18} />
-                        Position <span className="text-error">*</span>
-                    </span>
-                    </label>
-                    <input
-                    type="text"
-                    name="position"
-                    placeholder="e.g., Data Analyst"
-                    className="input input-bordered"
-                    value={formData.position}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
+            {/* Form Card */}
+            <div className="card bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <div onSubmit={handleSubmit}>
+                        {/* Row 1: Position & Company */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <Briefcase className="inline mr-2" size={18} />
+                                        Position <span className="text-error">*</span>
+                                    </span>
+                                </label>
+                                <input type="text" name="position" placeholder="e.g., Data Analyst" className="input input-bordered"
+                                    value={formData.position} onChange={handleChange} required />
+                            </div>
 
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        <Building2 className="inline mr-2" size={18} />
-                        Company <span className="text-error">*</span>
-                    </span>
-                    </label>
-                    <input
-                    type="text"
-                    name="company"
-                    placeholder="e.g., Tech Corp"
-                    className="input input-bordered"
-                    value={formData.company}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
-                </div>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <Building2 className="inline mr-2" size={18} />
+                                        Company <span className="text-error">*</span>
+                                    </span>
+                                </label>
+                                <input type="text" name="company" placeholder="e.g., Tech Corp" className="input input-bordered"
+                                    value={formData.company} onChange={handleChange} required />
+                            </div>
+                        </div>
 
-                {/* Row 2: Location & Setup */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        <MapPin className="inline mr-2" size={18} />
-                        Location <span className="text-error">*</span>
-                    </span>
-                    </label>
-                    <input
-                    type="text"
-                    name="location"
-                    placeholder="e.g., Manila, Philippines"
-                    className="input input-bordered"
-                    value={formData.location}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
+                        {/* Row 2: Location & Setup */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <MapPin className="inline mr-2" size={18} />
+                                        Location <span className="text-error">*</span>
+                                    </span>
+                                </label>
+                                <input type="text" name="location" placeholder="e.g., Manila, Philippines" className="input input-bordered"
+                                    value={formData.location} onChange={handleChange} required />
+                            </div>
 
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        <Laptop className="inline mr-2" size={18} />
-                        Work Setup
-                    </span>
-                    </label>
-                    <select
-                    name="setup"
-                    className="select select-bordered"
-                    value={formData.setup}
-                    onChange={handleChange}
-                    >
-                    <option value="">Select setup...</option>
-                    {setups.map(setup => (
-                        <option key={setup} value={setup}>{setup}</option>
-                    ))}
-                    </select>
-                </div>
-                </div>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <Laptop className="inline mr-2" size={18} />
+                                        Work Setup
+                                    </span>
+                                </label>
+                                <select name="setup" className="select select-bordered" value={formData.setup} onChange={handleChange} >
+                                    <option value="">Select setup...</option>
+                                    {setups.map(setup => (
+                                        <option key={setup} value={setup}>{setup}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
 
-                {/* Row 3: Platform & Date */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        Application Platform
-                    </span>
-                    </label>
-                    <select
-                    name="application_platform"
-                    className="select select-bordered"
-                    value={formData.application_platform}
-                    onChange={handleChange}
-                    >
-                    <option value="">Select platform...</option>
-                    {platforms.map(platform => (
-                        <option key={platform} value={platform}>{platform}</option>
-                    ))}
-                    </select>
-                </div>
+                        {/* Row 3: Platform & Date */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        Application Platform
+                                    </span>
+                                </label>
+                                <select name="application_platform" className="select select-bordered"
+                                    value={formData.application_platform} onChange={handleChange}>
+                                    <option value="">Select platform...</option>
+                                    {platforms.map(platform => (
+                                        <option key={platform} value={platform}>{platform}</option>
+                                    ))}
+                                </select>
+                            </div>
 
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        <Calendar className="inline mr-2" size={18} />
-                        Date Applied
-                    </span>
-                    </label>
-                    <input
-                    type="date"
-                    name="date_applied"
-                    className="input input-bordered"
-                    value={formatDateInput(formData.date_applied)}
-                    onChange={handleChange}
-                    />
-                </div>
-                </div>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <Calendar className="inline mr-2" size={18} />
+                                        Date Applied
+                                    </span>
+                                </label>
+                                <input type="date" name="date_applied" className="input input-bordered"
+                                    value={formatDateInput(formData.date_applied)} onChange={handleChange} />
+                            </div>
+                        </div>
 
-                {/* Row 4: Salary & Status */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        Salary (PHP)
-                    </span>
-                    </label>
-                    <input
-                    type="number"
-                    name="salary"
-                    placeholder="e.g., 25000"
-                    className="input input-bordered"
-                    value={formatSalary(formData.salary)}
-                    onChange={handleChange}
-                    min="0"
-                    />
-                </div>
+                        {/* Row 4: Salary & Status */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        Salary (PHP)
+                                    </span>
+                                </label>
+                                <input type="number" name="salary" placeholder="e.g., 25000" className="input input-bordered"
+                                    value={formatSalary(formData.salary)} onChange={handleChange} min="0" />
+                            </div>
 
-                <div className="form-control">
-                    <label className="label">
-                    <span className="label-text font-semibold">
-                        Status
-                    </span>
-                    </label>
-                    <select
-                    name="status"
-                    className="select select-bordered"
-                    value={formData.status}
-                    onChange={handleChange}
-                    >
-                    {statuses.map(status => (
-                        <option key={status} value={status}>{status}</option>
-                    ))}
-                    </select>
-                </div>
-                </div>
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        Status
+                                    </span>
+                                </label>
+                                <select name="status" className="select select-bordered"
+                                    value={formData.status} onChange={handleChange}>
+                                    {statuses.map(status => (
+                                        <option key={status} value={status}>{status}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
 
-                {/* Row 5: Description */}
-                <div className="form-control mb-6">
-                <label className="label">
-                    <span className="label-text font-semibold">
-                    <FileText className="inline mr-2" size={18} />
-                    Job Description
-                    </span>
-                </label>
-                <textarea
-                    name="description"
-                    placeholder="Add any notes or job description details..."
-                    className="textarea textarea-bordered h-32"
-                    value={formData.description}
-                    onChange={handleChange}
-                ></textarea>
-                </div>
+                        {/* Row 5: Description */}
+                        <div className="form-control mb-6">
+                            <label className="label">
+                                <span className="label-text font-semibold">
+                                <FileText className="inline mr-2" size={18} />
+                                Job Description
+                                </span>
+                            </label>
+                            <textarea name="description" placeholder="Add any notes or job description details..." className="textarea textarea-bordered h-32" 
+                                value={formData.description} onChange={handleChange}></textarea>
+                        </div>
 
-                {/* Action Buttons */}
-                <div className="card-actions justify-end gap-2">
-                <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={handleCancel}
-                    disabled={saving}
-                >
-                    Cancel
-                </button>
-                <button type="button" className="btn btn-error" onClick={() => handleDelete(formData._id)}>
-                    <Trash2 size={16} /> Delete
-                </button>
-                <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
-                    {saving ? (
-                    <>
-                        <span className="loading loading-spinner loading-sm"></span>
-                        Adding...
-                    </>
-                    ) : (
-                    <>
-                        <Pen size={18} />
-                        Update Application
-                    </>
-                    )}
-                </button>
+                        {/* Action Buttons */}
+                        <div className="card-actions justify-end gap-2">
+                            <button type="button" className="btn btn-ghost" onClick={handleCancel} disabled={saving}>Cancel</button>
+                            <button type="button" className="btn btn-error" onClick={() => handleDelete(formData._id)}>
+                                <Trash2 size={16} /> Delete
+                            </button>
+                            <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={saving}>
+                                {saving ? (
+                                <>
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                    Adding...
+                                </>
+                                ) : (
+                                <>
+                                    <Pen size={18} />
+                                    Update Application
+                                </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            </div>
-        </div>
         </div>
     );
 };
