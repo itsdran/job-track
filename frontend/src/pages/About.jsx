@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router';
 import { Header } from '../components/Header';
 
 import { Briefcase, Code, Database, Zap, Search, TrendingUp, Shield, Users, Github, Linkedin, Mail } from 'lucide-react';

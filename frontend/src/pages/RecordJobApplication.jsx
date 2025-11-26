@@ -10,6 +10,11 @@ import { statuses } from '../constants/statuses';
 import api from '../lib/axios';
 
 const RecordJobApplication = () => {
+
+    useEffect(() => {
+        document.title = 'Record New Application';
+    }, []);
+
     const { username } = useParams();
     const [userID, setUserID] = useState();
     const navigate = useNavigate();   

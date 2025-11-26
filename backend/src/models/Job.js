@@ -38,6 +38,7 @@ const jobSchema = new moose.Schema(
         },
         salary: {
             type: Number,
+            default: 0
         },
         status: {
             type: String,

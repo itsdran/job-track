@@ -31,7 +31,7 @@ const HomePage = () => {
                         <div className="flex gap-4 justify-center flex-wrap">
                             <button onClick={() => handleNavigation(`/users/${user.username}/jobs`)} className="btn btn-primary btn-lg gap-2">
                                 <Briefcase size={24} />
-                                Track your Job Applications
+                                Dashboard
                             </button>
                             <button onClick={() => handleNavigation(`/users/${user.username}/profile`)} className="btn btn-outline btn-lg gap-2">
                                 <User size={24} />

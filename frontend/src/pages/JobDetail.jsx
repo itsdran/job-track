@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { toast } from 'react-hot-toast';
 
-import { Briefcase, Building2, Trash2, ArrowLeft, MapPin, FileText, Calendar, Laptop, Pen} from 'lucide-react';
+import { Briefcase, Building2, Trash2, ArrowLeft, MapPin, FileText, Calendar, Laptop, Pen, PhilippinePeso, Rows4 } from 'lucide-react';
 import { platforms } from '../constants/platforms';
 import { setups } from '../constants/setups';
 import { statuses } from '../constants/statuses';
@@ -25,7 +25,7 @@ const JobDetail = () => {
         location: '',
         setup: '',
         description: '',
-        salary: '',
+        salary: 'N/A',
         status: ''
     });
 
@@ -37,6 +37,7 @@ const JobDetail = () => {
         const fetchJob = async () => {
             try {
                 const res = await api.get(`/jobs/${job_id}`);
+                document.title = `${res.data.position}`;
                 setFormData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
@@ -182,6 +183,7 @@ const JobDetail = () => {
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-semibold">
+                                        <Laptop className="inline mr-2" size={18} />
                                         Application Platform
                                     </span>
                                 </label>
@@ -211,16 +213,18 @@ const JobDetail = () => {
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-semibold">
+                                        <PhilippinePeso className="inline mr-2" size={18} />
                                         Salary (PHP)
                                     </span>
                                 </label>
                                 <input type="number" name="salary" placeholder="e.g., 25000" className="input input-bordered"
-                                    value={formData.salary} onChange={handleChange} min="0" />
+                                    value={formData.salary} onChange={handleChange}/>
                             </div>
 
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text font-semibold">
+                                        <Rows4 className="inline mr-2" size={18} />
                                         Status
                                     </span>
                                 </label>

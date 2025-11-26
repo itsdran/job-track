@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs-react";
 
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
@@ -37,15 +38,26 @@ export async function getUserByUN(req, res) {
 
 export async function signUpUser (req, res) {
     try {
-        const { first_name, last_name, username, password, 
+        const { first_name, last_name, username, password,
             email, phone_number, job_applying_for, 
             location_preference, salary_expectation, profile_summary, 
             skills, portfolio_link, linkedin_url, resume_cv } = req.body;
+
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
+
+        if (isExistingAccount) {
+            return res.json({ exists: !!existing });
+        } 
+
         const newUser = new User (
-            { first_name, last_name, username, password, 
-            email, phone_number, job_applying_for, 
-            location_preference, salary_expectation, profile_summary, 
-            skills, portfolio_link, linkedin_url, resume_cv } );
+                { first_name, last_name, username, hashedPassword, 
+                email, phone_number, job_applying_for, 
+                location_preference, salary_expectation, profile_summary, 
+                skills, portfolio_link, linkedin_url, resume_cv } );
 
         await newUser.save();
         res.status(201).json({message: "Account created successfully"});
@@ -96,24 +108,32 @@ export async function logInUser(req, res) {
 
 export async function updateUser (req, res) {
     try {
-        const { position, company, application_platform, date_applied, 
-            location, setup, description, salary, status } = req.body;
-        
-        const updateUser = await User.findByIdAndUpdate(req.params.id, 
-            { position, company, application_platform, date_applied, 
-            location, setup, description, salary, status },
+        const { first_name, last_name, phone_number, job_applying_for, location_preference, 
+            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_url, 
+            resume_cv, profile } = req.body;
+
+        // Don't allow username/email changes, so no duplicate check needed
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id, 
+            {   
+                first_name, last_name, phone_number, job_applying_for, location_preference, 
+                setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_url, 
+                resume_cv, profile 
+            },
             { new: true }
         );
 
-        if (!updateUser) return res.status(404).json({ error: "User not found" });
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
-        res.status(201).json({message: `Changes applied to account`});
+        res.status(200).json({ message: "Changes applied to account", user: updatedUser });
 
     } catch (error) {
         console.error("Error updating user information:", error);
         res.status(500).json({ error: "Internal Server Error" });        
     }
-} 
+}
 
 export async function deleteUser(req, res) {
 

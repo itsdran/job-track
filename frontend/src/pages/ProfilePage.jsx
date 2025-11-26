@@ -40,8 +40,7 @@ const ProfilePage = () => {
         portfolio_link: '',
         linkedin_link: '',
         resume_cv: null,
-        profile: '../avatars/avatar.svg',
-        createdAt: ''
+        profile: '../avatars/avatar.svg'
     });
 
     useEffect(() => {
@@ -50,10 +49,12 @@ const ProfilePage = () => {
             logout();
             return;
         }
+        document.title = `Profile`;
 
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
+
                 if (res.data.profile === "") res.data.profile = defaultAvatar
                 setUserData(res.data);
                 setIsRateLimited(false);
@@ -62,7 +63,7 @@ const ProfilePage = () => {
                     setIsRateLimited(true);
                     toast.error('You have made too many requests. Please try again later.');
                 } else {
-                    toast.error('Error fetching jobs:', error);
+                    toast.error('Error fetching user:', error);
                 }
             } finally {
                 setLoading(false);
@@ -81,21 +82,17 @@ const ProfilePage = () => {
             setIsEditing(true);
             return;
         }
-
         try {
             await api.put(`/users/${user._id}`, userData);
             toast.success('Profile updated successfully!');
             setIsEditing(false);
         } catch (error) {
-
             if (error.response && error.response.status === 429) {
                 setIsRateLimited(true);
                 toast.error('You have made too many requests. Please try again later.');
             } else {
                 toast.error('Error fetching jobs:', error);
             }
-
-            toast.error('Error updating profile');
             console.error('Update error:', error);
         }
     };
@@ -103,7 +100,7 @@ const ProfilePage = () => {
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
             try {
-                await api.delete(`/users/${user.username}`);
+                await api.delete(`users/${user.username}`);
                 toast.success("Account deleted successfully. Redirecting...");
                 logout();
                 navigate("/home");
@@ -179,7 +176,7 @@ const ProfilePage = () => {
                                             <div className="flex flex-wrap gap-3 mb-4">
                                                 {isEditing ? (
                                                     <>
-                                                        <input type="email" name="email" value={userData.email} onChange={handleChange} className="input input-bordered flex-1" placeholder="Email" />
+                                                        <input type="email" name="email" value={userData.email} onChange={handleChange} className="input input-bordered flex-1" placeholder="Email" disabled/>
                                                         <input type="tel" name="phone_number" value={userData.phone_number} onChange={handleChange} className="input input-bordered flex-1" placeholder="Phone" />
                                                     </>
                                                 ) : (

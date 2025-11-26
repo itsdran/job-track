@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 import axios from '../lib/axios';
@@ -8,6 +8,11 @@ import { useNavigate } from 'react-router';
 import { AuthContext } from './AuthContext';
 
 const LoginPage = () => {
+
+    useEffect(() => {
+        document.title = 'Log In';
+    }, []);
+
     const [formData, setFormData] = useState({
         identifier: '',
         password: ''

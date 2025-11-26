@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { User, Mail, Lock, Laptop, MapPin, Briefcase, DollarSign, FileText, Code, ExternalLink, Linkedin, Upload } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, Laptop, MapPin, Briefcase, Code, ExternalLink, Linkedin, Upload } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import { setups } from '../constants/setups';
 import axios from '../lib/axios';
 
 const SignupPage = () => {
+
+    useEffect(() => {
+        document.title = 'Sign Up';
+    }, []);
+
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -55,12 +60,6 @@ const SignupPage = () => {
             return;
         }
 
-        isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
-        if (isExistingAccount) {
-            toast.error('An account with this email or username already exists');
-            return;
-        }
-
         if (formData.password !== formData.confirm_password) {
             toast.error('Passwords do not match');
             return;
@@ -72,17 +71,15 @@ const SignupPage = () => {
             return;
         }
 
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        formData.password = hashedPassword;
-
         setLoading(true);
 
         try {
-            await axios.post("/signup", formData);
-            toast.success('Account created successfully! You can now log in.');
-            navigate('/login');
+            const res = await axios.post("/signup", formData);
+            if (res.data.exists) 
+                toast.error("Email or Username is already taken");
+            else
+                toast.success('Account created successfully! You can now log in.');
+                navigate('/login');
         } catch (error) {
             toast.error('Error creating account. Please try again.');
             console.error('Signup error:', error);
@@ -107,7 +104,7 @@ const SignupPage = () => {
                         {/* Personal Information Section */}
                         <div className="mb-6">
                             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                            <User size={24} />
+                            <UserIcon size={24} />
                             Personal Information
                             </h2>
                             <div className="divider mt-0"></div>
@@ -141,7 +138,7 @@ const SignupPage = () => {
                                 <div className="form-control">
                                     <label className="label">
                                         <span className="label-text font-semibold">
-                                            <User className="inline mr-1" size={16} /> Username <span className="text-error">*</span>
+                                            <UserIcon className="inline mr-1" size={16} /> Username <span className="text-error">*</span>
                                         </span>
                                     </label>
                                     <input type="text" name="username" placeholder="juandelacruz" className="input input-bordered"
