@@ -65,7 +65,7 @@ const userSchema = new moose.Schema(
             type: String,
             default: ""
         },
-        linkedin_url: {
+        linkedin_link: {
             type: String,
             default: ""
         },
@@ -75,7 +75,7 @@ const userSchema = new moose.Schema(
         },
         profile: {
             type: String,
-            default: ""
+            default: "../avatars/avatar.svg"
         },
         isActive: {
             type: Boolean,

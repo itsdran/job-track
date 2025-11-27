@@ -26,7 +26,7 @@ const SignupPage = () => {
         skills: '',
         portfolio_link: '',
         linkedin_link: '',
-        resume: null
+        resume_cv: null
     });
 
     const [loading, setLoading] = useState(false);

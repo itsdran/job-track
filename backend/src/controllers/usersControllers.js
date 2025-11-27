@@ -38,10 +38,9 @@ export async function getUserByUN(req, res) {
 
 export async function signUpUser (req, res) {
     try {
-        const { first_name, last_name, username, password,
-            email, phone_number, job_applying_for, 
-            location_preference, salary_expectation, profile_summary, 
-            skills, portfolio_link, linkedin_url, resume_cv } = req.body;
+        const { first_name, last_name, email, username, phone_number, password, job_applying_for, location_preference, 
+            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
+            resume_cv, profile } = req.body;
 
         // Hash the password
         const salt = await bcrypt.genSalt(10);
@@ -51,13 +50,16 @@ export async function signUpUser (req, res) {
 
         if (isExistingAccount) {
             return res.json({ exists: !!isExistingAccount });
-        } 
+        }
 
+        const skillsArray = typeof skills === "string"
+            ? skills.split(",").map(s => s.trim()).filter(Boolean)
+            : skills;
+        
         const newUser = new User (
-                { first_name, last_name, username, password: hashedPassword, 
-                email, phone_number, job_applying_for, 
-                location_preference, salary_expectation, profile_summary, 
-                skills, portfolio_link, linkedin_url, resume_cv } );
+            { first_name, last_name, email, username, phone_number, password: hashedPassword, job_applying_for, location_preference, 
+            setup_preference, salary_expectation, profile_summary, skills: skillsArray, portfolio_link, linkedin_link, 
+            resume_cv, profile } );
 
         await newUser.save();
         res.status(201).json({message: "Account created successfully"});

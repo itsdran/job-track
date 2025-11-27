@@ -40,7 +40,7 @@ const ProfilePage = () => {
         portfolio_link: '',
         linkedin_link: '',
         resume_cv: null,
-        profile: '../avatars/avatar.svg'
+        profile: ''
     });
 
     useEffect(() => {
@@ -54,8 +54,6 @@ const ProfilePage = () => {
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
-
-                if (res.data.profile === "") res.data.profile = defaultAvatar
                 setUserData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
@@ -100,7 +98,7 @@ const ProfilePage = () => {
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
             try {
-                await api.delete(`users/${user.username}`);
+                await api.delete(`users/${user._id}`);
                 toast.success("Account deleted successfully. Redirecting...");
                 logout();
                 navigate("/home");
@@ -190,12 +188,12 @@ const ProfilePage = () => {
                                             {isEditing ? (
                                                 <div className="space-y-2">
                                                     <input type="url" name="portfolio_link" value={userData.portfolio_link} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="Portfolio URL" />
-                                                    <input type="url" name="linkedin_url" value={userData.linkedin_url} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="LinkedIn URL" />
+                                                    <input type="url" name="linkedin_url" value={userData.linkedin_link} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="LinkedIn URL" />
                                                 </div>
                                             ) : (
                                                 <>
                                                     {userData.portfolio_link && (<a href={userData.portfolio_link} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-ghost gap-2 mr-2"><ExternalLink size={16} />Portfolio</a>)}
-                                                    {userData.linkedin_url && (<a href={userData.linkedin_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-ghost gap-2"><Linkedin size={16} />LinkedIn</a>)}
+                                                    {userData.linkedin_link && (<a href={userData.linkedin_link} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-ghost gap-2"><Linkedin size={16} />LinkedIn</a>)}
                                                 </>
                                             )}
                                         </div>
