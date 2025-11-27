@@ -42,6 +42,9 @@ const LoginPage = () => {
         try {
             const res = await axios.post("/users/login", formData);
 
+            if (!res)  
+              toast.success('No account found!');
+
             login(res.data.user, res.data.token);
 
             toast.success('Login successfully! Redirecting...');

@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs-react";
+import bcrypt from "bcryptjs";
 
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
@@ -47,14 +47,14 @@ export async function signUpUser (req, res) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
+        const isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
 
         if (isExistingAccount) {
-            return res.json({ exists: !!existing });
+            return res.json({ exists: !!isExistingAccount });
         } 
 
         const newUser = new User (
-                { first_name, last_name, username, hashedPassword, 
+                { first_name, last_name, username, password: hashedPassword, 
                 email, phone_number, job_applying_for, 
                 location_preference, salary_expectation, profile_summary, 
                 skills, portfolio_link, linkedin_url, resume_cv } );
@@ -78,7 +78,7 @@ export async function logInUser(req, res) {
 
         if (!user) return res.status(400).json({ message: "User not found" });
 
-        const isMatch = password === user.password;
+        const isMatch = bcrypt.compare(password, user.password)
 
         if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
 
