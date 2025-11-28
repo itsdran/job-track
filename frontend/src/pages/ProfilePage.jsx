@@ -6,7 +6,6 @@ import {    User, Mail, Phone, MapPin, Briefcase, PhilippinePeso, FileText, Code
 import { AuthContext } from './AuthContext';
 import { formatDate } from '../lib/utils.js';
 import { setups } from '../constants/setups.js';
-import defaultAvatar from "../avatars/avatar.svg";
 
 import api from '../lib/axios';
 
@@ -42,6 +41,9 @@ const ProfilePage = () => {
         resume_cv: null,
         profile: ''
     });
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     useEffect(() => {
         if (isAuthenticated === false) {
@@ -109,9 +111,7 @@ const ProfilePage = () => {
     };
 
     const handleViewResume = () => {
-        if (userData?.resume_cv) {
-        window.open(userData.resume_cv, '_blank');
-        }
+        if (userData?.resume_cv) window.open(userData.resume_cv, '_blank');
     };
 
     if (loading) {

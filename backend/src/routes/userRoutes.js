@@ -1,11 +1,13 @@
 import express from "express";
+import upload from '../config/multer.js';
+
 import {  getAllUsers,  signUpUser, logInUser, getUserByID, getUserByUN, updateUser, deleteUser } from "../controllers/usersControllers.js";
 
 import { getAllJobsFromUserID } from "../controllers/jobsControllers.js";
 
 const router = express.Router();
 
-router.post("/signup", signUpUser);
+router.post("/signup",  upload.single('profile'), signUpUser);
 router.post("/login", logInUser);
 
 router.get("/", getAllUsers); // testing purpose only

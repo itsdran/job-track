@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
+import multer from 'multer';
 
 import userRoutes from "./routes/userRoutes.js";
 import jobsRoutes from "./routes/jobsRoutes.js";
@@ -33,6 +34,7 @@ app.use("/api/jobs", jobsRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
   });

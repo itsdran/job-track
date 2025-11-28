@@ -36,11 +36,14 @@ export async function getUserByUN(req, res) {
     }
 }
 
+
 export async function signUpUser (req, res) {
     try {
         const { first_name, last_name, email, username, phone_number, password, job_applying_for, location_preference, 
             setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
-            resume_cv, profile } = req.body;
+            resume_cv } = req.body;
+
+        const profilePicUrl = req.file ? `/uploads/${req.file.filename}` : '../avatars/avatar.svg';
 
         // Hash the password
         const salt = await bcrypt.genSalt(10);
@@ -59,7 +62,7 @@ export async function signUpUser (req, res) {
         const newUser = new User (
             { first_name, last_name, email, username, phone_number, password: hashedPassword, job_applying_for, location_preference, 
             setup_preference, salary_expectation, profile_summary, skills: skillsArray, portfolio_link, linkedin_link, 
-            resume_cv, profile } );
+            resume_cv, profile: profilePicUrl } );
 
         await newUser.save();
         res.status(201).json({message: "Account created successfully"});
