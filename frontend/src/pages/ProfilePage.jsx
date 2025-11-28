@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {    User, Mail, Phone, MapPin, Briefcase, PhilippinePeso, FileText, Code, ExternalLink, Linkedin, 
-            Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus } from 'lucide-react';
+            Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus, Upload } from 'lucide-react';
 
 import { AuthContext } from './AuthContext';
 import { formatDate } from '../lib/utils.js';
@@ -41,6 +41,8 @@ const ProfilePage = () => {
         resume_cv: null,
         profile: ''
     });
+
+    const defaultAvatar = '../avatars/avatar.svg';
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -113,6 +115,52 @@ const ProfilePage = () => {
     const handleViewResume = () => {
         if (userData?.resume_cv) window.open(userData.resume_cv, '_blank');
     };
+    
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) {
+            toast.error('Please select an image first');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profile', selectedImage);
+
+        try {
+            const res = await api.put(`/users/${user._id}/profile-picture`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setUserData(prev => ({ ...prev, profile: res.data.profile }));
+            setImagePreview(null);
+            setSelectedImage(null);
+            toast.success('Profile picture updated!');
+        } catch (error) {
+            toast.error('Error uploading image');
+            console.error('Upload error:', error);
+        }
+    };
+
+    const handleImageDelete = async () => {
+        if (window.confirm('Are you sure you want to delete your profile picture?')) {
+            try {
+                await api.delete(`/users/${user._id}/profile-picture`);
+                setUserData(prev => ({ ...prev, profile: defaultAvatar }));
+                setImagePreview(null);
+                setSelectedImage(null);
+                toast.success('Profile picture deleted!');
+            } catch (error) {
+                toast.error('Error deleting image');
+                console.error('Delete error:', error);
+            }
+        }
+    };
 
     if (loading) {
         return (<div className="flex justify-center items-center min-h-screen"><span className="loading loading-spinner loading-lg"></span></div>);
@@ -152,11 +200,27 @@ const ProfilePage = () => {
                                         <div className="flex-shrink-0">
                                             <div className="avatar">
                                                 <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                                    <img src={userData.profile} alt={`${userData.first_name} ${userData.last_name}`} />
+                                                    <img src={imagePreview || userData.profile} alt={`${userData.first_name} ${userData.last_name}`} />
                                                 </div>
                                             </div>
+                                            {isEditing && (
+                                                <div className="mt-3 flex flex-col gap-2">
+                                                    <input type="file" accept="image/*" onChange={handleImageChange} className="file-input file-input-bordered file-input-xs w-full max-w-xs" />
+                                                    {selectedImage && (
+                                                        <button onClick={handleImageUpload} className="btn btn-success btn-xs">
+                                                            <Upload size={14} />
+                                                            Upload
+                                                        </button>
+                                                    )}
+                                                    {userData.profile && userData.profile !== defaultAvatar && (
+                                                        <button onClick={handleImageDelete} className="btn btn-error btn-xs">
+                                                            <Trash2 size={14} />
+                                                            Delete Picture
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-
                                         <div className="flex-1">
                                             {isEditing ? (
                                                 <div className="space-y-3 gap-3 mb-4">
@@ -188,7 +252,7 @@ const ProfilePage = () => {
                                             {isEditing ? (
                                                 <div className="space-y-2">
                                                     <input type="url" name="portfolio_link" value={userData.portfolio_link} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="Portfolio URL" />
-                                                    <input type="url" name="linkedin_url" value={userData.linkedin_link} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="LinkedIn URL" />
+                                                    <input type="url" name="linkedin_link" value={userData.linkedin_link} onChange={handleChange} className="input input-bordered flex-1 w-full" placeholder="LinkedIn URL" />
                                                 </div>
                                             ) : (
                                                 <>

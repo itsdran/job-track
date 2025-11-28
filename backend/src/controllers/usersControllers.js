@@ -113,9 +113,19 @@ export async function logInUser(req, res) {
 
 export async function updateUser (req, res) {
     try {
-        const { first_name, last_name, phone_number, job_applying_for, location_preference, 
+        const { first_name, last_name, email, username, phone_number, job_applying_for, location_preference, 
             setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_url, 
             resume_cv, profile } = req.body;
+
+        // Check for duplicates BUT exclude the current user
+        const isDuplicate = await User.findOne({
+            _id: { $ne: req.params.id }, // Exclude current user
+            $or: [{ email }, { username }]
+        });
+
+        if (isDuplicate) {
+            return res.status(400).json({ error: "Email or username already exists" });
+        }
 
         // Don't allow username/email changes, so no duplicate check needed
         const updatedUser = await User.findByIdAndUpdate(
@@ -137,6 +147,50 @@ export async function updateUser (req, res) {
     } catch (error) {
         console.error("Error updating user information:", error);
         res.status(500).json({ error: "Internal Server Error" });        
+    }
+}
+
+export async function updateProfilePicture (req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const profileUrl = `/uploads/${req.file.filename}`;
+        
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { profile: profileUrl },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ message: "Profile picture updated", profileUrl });
+    } catch (error) {
+        console.error("Error updating profile picture:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function deleteProfilePicture(req, res) {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { profile: '../avatars/avatar.svg' },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ message: "Profile picture deleted" });
+    } catch (error) {
+        console.error("Error deleting profile picture:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 }
 

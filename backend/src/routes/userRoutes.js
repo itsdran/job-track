@@ -1,7 +1,8 @@
 import express from "express";
 import upload from '../config/multer.js';
 
-import {  getAllUsers,  signUpUser, logInUser, getUserByID, getUserByUN, updateUser, deleteUser } from "../controllers/usersControllers.js";
+import {    getAllUsers,  signUpUser, logInUser, getUserByID, getUserByUN, 
+            updateUser, updateProfilePicture, deleteProfilePicture, deleteUser } from "../controllers/usersControllers.js";
 
 import { getAllJobsFromUserID } from "../controllers/jobsControllers.js";
 
@@ -15,6 +16,9 @@ router.get("/:username", getUserByUN);
 router.get("/:id", getUserByID);
 
 router.put("/:id", updateUser);
+router.put("/:id/profile-picture", upload.single('profile'), updateProfilePicture);
+router.delete("/:id/profile-picture", upload.single('profile'), deleteProfilePicture);
+
 router.delete("/:id", deleteUser);
 
 router.get("/:username/jobs", getAllJobsFromUserID);
