@@ -4,13 +4,13 @@ import About from './pages/About'
 import ProfilePage from './pages/ProfilePage';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
+import ForgotPassword from './pages/ForgotPassword.jsx';
 import ViewApplications from './pages/ViewApplications';
 import RecordJobApplication from './pages/RecordJobApplication';
 import ViewJob from './pages/JobDetail';
 
 import { Toaster } from 'react-hot-toast';
 
-import { Header } from './components/Header.jsx';
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 
@@ -24,6 +24,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/about" element={<About/>} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="users/:username/profile" element={
           <ProtectedRoute>
             <ProfilePage />

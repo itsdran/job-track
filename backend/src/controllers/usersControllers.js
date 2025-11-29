@@ -114,7 +114,7 @@ export async function logInUser(req, res) {
 export async function updateUser (req, res) {
     try {
         const { first_name, last_name, email, username, phone_number, job_applying_for, location_preference, 
-            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_url, 
+            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
             resume_cv, profile } = req.body;
 
         // Check for duplicates BUT exclude the current user
@@ -132,7 +132,7 @@ export async function updateUser (req, res) {
             req.params.id, 
             {   
                 first_name, last_name, phone_number, job_applying_for, location_preference, 
-                setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_url, 
+                setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
                 resume_cv, profile 
             },
             { new: true }
@@ -168,7 +168,7 @@ export async function updateProfilePicture (req, res) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        res.status(200).json({ message: "Profile picture updated", profileUrl });
+        res.status(200).json({ message: "Profile picture updated", profile: profileUrl });
     } catch (error) {
         console.error("Error updating profile picture:", error);
         res.status(500).json({ error: "Internal Server Error" });

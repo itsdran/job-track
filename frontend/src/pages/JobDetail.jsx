@@ -8,7 +8,7 @@ import { setups } from '../constants/setups';
 import { statuses } from '../constants/statuses';
 
 import api from '../lib/axios';
-import { formatDateInput, formatSalary } from '../lib/utils.js';
+import { formatDateInput } from '../lib/utils.js';
 
 import RateLimitedUI from '../components/RateLimited';
 
@@ -76,7 +76,8 @@ const JobDetail = () => {
 
         try {
             await api.put(`/jobs/${job_id}`, formData);
-            toast.success('Application updated successfully');
+            toast.success('Application updated successfully!');
+            navigate (`/users/${username}/jobs`);
         } catch (error) {
             toast.error('Error updated application:', error);
             console.error('Error updated application:', error);

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {    User, Mail, Phone, MapPin, Briefcase, PhilippinePeso, FileText, Code, ExternalLink, Linkedin, 
             Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus, Upload } from 'lucide-react';
+import defaultAvatar from '../avatars/avatar.svg';
 
 import { AuthContext } from './AuthContext';
 import { formatDate } from '../lib/utils.js';
@@ -42,8 +43,6 @@ const ProfilePage = () => {
         profile: ''
     });
 
-    const defaultAvatar = '../avatars/avatar.svg';
-
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
@@ -58,6 +57,14 @@ const ProfilePage = () => {
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
+
+                if (!res.data.profile || res.data.profile === '' || res.data.profile === '../avatars/avatar.svg') {
+                    res.data.profile = defaultAvatar;
+                } else if (res.data.profile.startsWith('/uploads/')) {
+                    // If it's an uploaded image, prepend the API base URL
+                    res.data.profile = `http://localhost:5001${res.data.profile}`;
+                }
+
                 setUserData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
@@ -137,7 +144,11 @@ const ProfilePage = () => {
             const res = await api.put(`/users/${user._id}/profile-picture`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            setUserData(prev => ({ ...prev, profile: res.data.profile }));
+            // Fix the profile URL
+            const profileUrl = res.data.profileUrl.startsWith('/uploads/') 
+                ? `http://localhost:5001${res.data.profile}` 
+                : res.data.profileUrl;
+            setUserData(prev => ({ ...prev, profile: profileUrl }));
             setImagePreview(null);
             setSelectedImage(null);
             toast.success('Profile picture updated!');
