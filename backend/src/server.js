@@ -2,18 +2,20 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
-import multer from 'multer';
+import { fileURLToPath } from 'url';
 
+import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import jobsRoutes from "./routes/jobsRoutes.js";
+
 import connectDB from "./config/db.js";
 import rateLimiter from "./middleware/rateLimiter.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const __dirname = path.resolve();
 
 app.use(cors({
   origin: "http://localhost:5173",
@@ -21,7 +23,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
 app.use(rateLimiter);
 
 app.use((req, res, next) => {
@@ -29,12 +30,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobsRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
   });

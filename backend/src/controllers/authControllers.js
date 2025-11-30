@@ -1,0 +1,108 @@
+import User from '../models/User.js';
+
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+
+export async function signUpUser (req, res) {
+    try {
+        const { first_name, last_name, email, username, phone_number, password, job_applying_for, location_preference, 
+            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
+            resume_cv } = req.body;
+
+        const profilePicUrl = req.file ? `/uploads/${req.file.filename}` : '';
+
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
+
+        if (isExistingAccount) {
+            return res.json({ exists: !!isExistingAccount });
+        }
+
+        const skillsArray = typeof skills === "string"
+            ? skills.split(",").map(s => s.trim()).filter(Boolean)
+            : skills;
+        
+        const newUser = new User (
+            { first_name, last_name, email, username, phone_number, password: hashedPassword, job_applying_for, location_preference, 
+            setup_preference, salary_expectation, profile_summary, skills: skillsArray, portfolio_link, linkedin_link, 
+            resume_cv, profile: profilePicUrl } );
+
+        await newUser.save();
+        res.status(201).json({message: "Account created successfully"});
+
+    } catch (error) {
+        console.error("Error creating account:", error);
+        res.status(500).json({ error: "Internal Server Error" });        
+    }
+} 
+
+export async function logInUser(req, res) {
+    try {
+        const { identifier, password } = req.body;
+
+        const user = await User.findOne({
+            $or: [{ email: identifier }, { username: identifier }]
+        });
+
+        if (!user) return res.status(400).json({ message: "User not found" });
+
+        const isMatch = bcrypt.compare(password, user.password)
+
+        if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
+
+        const token = jwt.sign(
+            { id: user._id, username: user.username, first_name: user.first_name },
+            process.env.JWT_SECRET || "defaultsecret",
+            { expiresIn: "7d" }
+        );
+
+        res.status(200).json({
+            message: "Login successful",
+            userId: user._id,
+            username: user.username,
+            token,
+            user: {
+                username: user.username,
+                _id: user._id,
+                first_name: user.first_name
+            }
+        });
+
+    } catch (error) {
+        console.error("Error logging in:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function forgotPassword (req, res) {
+    try {
+        const { identifier } = req.body;
+
+        if (!identifier)
+            return res.status(400).json({ error: "Email is required" });
+
+        const user = await User.findOne({
+            $or: [{ email: identifier }, { username: identifier }]
+        });
+        
+        if (!user)
+            return res.status(404).json({ error: "No account found with that email" });
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        // Hash token to save in DB
+        const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+        await user.save();
+
+    } catch (error) {
+        console.error("Forgot Password Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}

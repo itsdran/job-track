@@ -40,7 +40,7 @@ const LoginPage = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post("/users/login", formData);
+            const res = await axios.post("/auth/login", formData);
 
             if (!res)  
               toast.success('No account found!');

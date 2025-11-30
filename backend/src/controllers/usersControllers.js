@@ -1,6 +1,4 @@
 import User from '../models/User.js';
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 // Testing purpose: get all users
 export async function getAllUsers (req, res) {
@@ -32,81 +30,6 @@ export async function getUserByUN(req, res) {
         res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user account by username:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-}
-
-
-export async function signUpUser (req, res) {
-    try {
-        const { first_name, last_name, email, username, phone_number, password, job_applying_for, location_preference, 
-            setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
-            resume_cv } = req.body;
-
-        const profilePicUrl = req.file ? `/uploads/${req.file.filename}` : '../avatars/avatar.svg';
-
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const isExistingAccount = await User.findOne({ $or: [{ email }, { username }]});
-
-        if (isExistingAccount) {
-            return res.json({ exists: !!isExistingAccount });
-        }
-
-        const skillsArray = typeof skills === "string"
-            ? skills.split(",").map(s => s.trim()).filter(Boolean)
-            : skills;
-        
-        const newUser = new User (
-            { first_name, last_name, email, username, phone_number, password: hashedPassword, job_applying_for, location_preference, 
-            setup_preference, salary_expectation, profile_summary, skills: skillsArray, portfolio_link, linkedin_link, 
-            resume_cv, profile: profilePicUrl } );
-
-        await newUser.save();
-        res.status(201).json({message: "Account created successfully"});
-
-    } catch (error) {
-        console.error("Error creating account:", error);
-        res.status(500).json({ error: "Internal Server Error" });        
-    }
-} 
-
-export async function logInUser(req, res) {
-    try {
-        const { identifier, password } = req.body;
-
-        const user = await User.findOne({
-            $or: [{ email: identifier }, { username: identifier }]
-        });
-
-        if (!user) return res.status(400).json({ message: "User not found" });
-
-        const isMatch = bcrypt.compare(password, user.password)
-
-        if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
-
-        const token = jwt.sign(
-            { id: user._id, username: user.username, first_name: user.first_name },
-            process.env.JWT_SECRET || "defaultsecret",
-            { expiresIn: "7d" }
-        );
-
-        res.status(200).json({
-            message: "Login successful",
-            userId: user._id,
-            username: user.username,
-            token,
-            user: {
-                username: user.username,
-                _id: user._id,
-                first_name: user.first_name
-            }
-        });
-
-    } catch (error) {
-        console.error("Error logging in:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
@@ -150,17 +73,17 @@ export async function updateUser (req, res) {
     }
 }
 
-export async function updateProfilePicture (req, res) {
+export async function updateProfilePicture(req, res) {
     try {
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
 
-        const profileUrl = `/uploads/${req.file.filename}`;
-        
+        const profile = `/uploads/${req.file.filename}`;
+
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { profile: profileUrl },
+            { profile },
             { new: true }
         );
 
@@ -168,7 +91,10 @@ export async function updateProfilePicture (req, res) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        res.status(200).json({ message: "Profile picture updated", profile: profileUrl });
+        res.status(200).json({
+            message: "Profile picture updated",
+            profile  // Return the path, frontend will normalize it
+        });
     } catch (error) {
         console.error("Error updating profile picture:", error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -179,7 +105,7 @@ export async function deleteProfilePicture(req, res) {
     try {
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { profile: '../avatars/avatar.svg' },
+            { profile: "" },  
             { new: true }
         );
 
@@ -187,7 +113,10 @@ export async function deleteProfilePicture(req, res) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        res.status(200).json({ message: "Profile picture deleted" });
+        res.status(200).json({ 
+            message: "Profile picture deleted",
+            profile: ""  // Return empty string for consistency
+        });
     } catch (error) {
         console.error("Error deleting profile picture:", error);
         res.status(500).json({ error: "Internal Server Error" });

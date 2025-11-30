@@ -74,7 +74,7 @@ const SignupPage = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post("users/signup", formData);
+            const res = await axios.post("auth/signup", formData);
             if (res.data.exists) 
                 toast.error("Email or Username is already taken");
             else

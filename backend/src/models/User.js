@@ -75,7 +75,7 @@ const userSchema = new moose.Schema(
         },
         profile: {
             type: String,
-            default: "../avatars/avatar.svg"
+            default: ""
         },
         isActive: {
             type: Boolean,

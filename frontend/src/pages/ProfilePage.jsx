@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {    User, Mail, Phone, MapPin, Briefcase, PhilippinePeso, FileText, Code, ExternalLink, Linkedin, 
-            Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus, Upload } from 'lucide-react';
+            Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus, Upload, X } from 'lucide-react';
 import defaultAvatar from '../avatars/avatar.svg';
 
 import { AuthContext } from './AuthContext';
@@ -39,12 +39,22 @@ const ProfilePage = () => {
         skills: [],
         portfolio_link: '',
         linkedin_link: '',
-        resume_cv: null,
+        resume_cv: '',
         profile: ''
     });
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+
+    const normalizeProfileUrl = (profilePath) => {
+        console.log('Normalizing profile path:', profilePath);
+        if (!profilePath || profilePath === "")  return defaultAvatar;
+        if (profilePath.startsWith('/uploads/')) return `http://localhost:5001${profilePath}`;
+
+        console.log('Using:', profilePath);
+
+        return profilePath;
+    };
 
     useEffect(() => {
         if (isAuthenticated === false) {
@@ -57,29 +67,75 @@ const ProfilePage = () => {
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
-
-                if (!res.data.profile || res.data.profile === '' || res.data.profile === '../avatars/avatar.svg') {
-                    res.data.profile = defaultAvatar;
-                } else if (res.data.profile.startsWith('/uploads/')) {
-                    // If it's an uploaded image, prepend the API base URL
-                    res.data.profile = `http://localhost:5001${res.data.profile}`;
-                }
-
+                res.data.profile = normalizeProfileUrl(res.data.profile);
                 setUserData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
-                if (error.response && error.response.status === 429) {
+                if (error.response?.status === 429) {
                     setIsRateLimited(true);
                     toast.error('You have made too many requests. Please try again later.');
                 } else {
-                    toast.error('Error fetching user:', error);
+                    toast.error('Error fetching user');
                 }
             } finally {
                 setLoading(false);
             }
-        };
+            };
         fetchUserData();
-    }, [user._id]);
+    }, [user._id, isAuthenticated, logout]);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) {
+            toast.error('Please select an image first');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profile', selectedImage);
+
+        try {
+            const res = await api.put(`/users/${user._id}/profile-picture`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            
+            console.log('Upload response:', res.data);
+            const profileUrl = normalizeProfileUrl(res.data.profile);
+            console.log('Normalized URL:', profileUrl);
+            
+            setUserData(prev => ({ ...prev, profile: profileUrl }));
+            setImagePreview(null);
+            setSelectedImage(null);
+            toast.success('Profile picture updated!');
+        } catch (error) {
+            toast.error('Error uploading image');
+            console.error('Upload error details:', error.response?.data);
+        }
+    };
+
+    const handleImageDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete your profile picture?')) {
+            return;
+        }
+        
+        try {
+            await api.delete(`/users/${user._id}/profile-picture`);
+            setUserData(prev => ({ ...prev, profile: defaultAvatar }));
+            setImagePreview(null);
+            setSelectedImage(null);
+            toast.success('Profile picture deleted!');
+        } catch (error) {
+            toast.error('Error deleting image');
+            console.error('Delete error:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -106,6 +162,14 @@ const ProfilePage = () => {
         }
     };
 
+    const handleCancel = async () => {
+        try {
+            setIsEditing(false);
+        } catch (error) {
+            toast.error('Error cancelling edit mode');
+        }
+    }
+
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
             try {
@@ -123,56 +187,6 @@ const ProfilePage = () => {
         if (userData?.resume_cv) window.open(userData.resume_cv, '_blank');
     };
     
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedImage(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
-    };
-
-    const handleImageUpload = async () => {
-        if (!selectedImage) {
-            toast.error('Please select an image first');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('profile', selectedImage);
-
-        try {
-            const res = await api.put(`/users/${user._id}/profile-picture`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            // Fix the profile URL
-            const profileUrl = res.data.profileUrl.startsWith('/uploads/') 
-                ? `http://localhost:5001${res.data.profile}` 
-                : res.data.profileUrl;
-            setUserData(prev => ({ ...prev, profile: profileUrl }));
-            setImagePreview(null);
-            setSelectedImage(null);
-            toast.success('Profile picture updated!');
-        } catch (error) {
-            toast.error('Error uploading image');
-            console.error('Upload error:', error);
-        }
-    };
-
-    const handleImageDelete = async () => {
-        if (window.confirm('Are you sure you want to delete your profile picture?')) {
-            try {
-                await api.delete(`/users/${user._id}/profile-picture`);
-                setUserData(prev => ({ ...prev, profile: defaultAvatar }));
-                setImagePreview(null);
-                setSelectedImage(null);
-                toast.success('Profile picture deleted!');
-            } catch (error) {
-                toast.error('Error deleting image');
-                console.error('Delete error:', error);
-            }
-        }
-    };
-
     if (loading) {
         return (<div className="flex justify-center items-center min-h-screen"><span className="loading loading-spinner loading-lg"></span></div>);
     }
@@ -200,6 +214,9 @@ const ProfilePage = () => {
                                 <h1 className="text-4xl font-bold">My Profile</h1>
                                 <div className="flex gap-2">
                                     {userData.resume_cv && (<button onClick={handleViewResume} className="btn btn-info btn-sm gap-2"><Download size={16} />View Resume</button>)}
+                                    {isEditing && ( 
+                                        <button onClick={handleCancel} className="btn btn-neutral btn-sm gap-2"><X size={16} />Cancel </button>)
+                                    }
                                     <button onClick={handleUpdate} className="btn btn-warning btn-sm gap-2">{isEditing ? <><Save size={16} />Save Update</> : <><Edit size={16} />Update</>}</button>
                                     <button onClick={handleDelete} className="btn btn-error btn-sm gap-2"><Trash2 size={16} />Delete</button>
                                 </div>
@@ -211,7 +228,7 @@ const ProfilePage = () => {
                                         <div className="flex-shrink-0">
                                             <div className="avatar">
                                                 <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                                    <img src={imagePreview || userData.profile} alt={`${userData.first_name} ${userData.last_name}`} />
+                                                    <img src={imagePreview || userData.profile || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
                                                 </div>
                                             </div>
                                             {isEditing && (
