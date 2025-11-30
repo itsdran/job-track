@@ -11,7 +11,7 @@ const router = express.Router();
 router.get("/", getAllUsers); // testing purpose only
 router.get("/:username", getUserByUN);
 router.get("/:id", getUserByID);
-router.put("/id/:id", updateUser);
+router.put("/:id", updateUser);
 
 router.put("/:id/profile-picture", upload.single('profile'), updateProfilePicture);
 router.delete("/:id/profile-picture", deleteProfilePicture);
