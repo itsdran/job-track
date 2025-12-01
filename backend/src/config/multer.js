@@ -1,22 +1,33 @@
+// In your current upload.js file
 import multer from 'multer';
 import path from 'path';
 
-// Storage engine
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'src/uploads/'); // Folder to save uploaded files
+        cb(null, 'src/uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, `profile_${Date.now()}${path.extname(file.originalname)}`);
+        // Use the type parameter from route to determine prefix
+        const type = req.params.type || 'file';
+        cb(null, `${type}_${Date.now()}${path.extname(file.originalname)}`);
     },
 });
 
-// File filter (optional, to accept only images)
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    const allowedMimeTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed'), false);
+        cb(new Error('Only image, PDF, DOC, and DOCX files are allowed'), false);
     }
 };
 

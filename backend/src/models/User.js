@@ -69,7 +69,7 @@ const userSchema = new moose.Schema(
             type: String,
             default: ""
         },
-        resume_cv: {
+        resume: {
             type: String, 
             default: "", 
         },

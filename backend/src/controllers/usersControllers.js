@@ -75,13 +75,12 @@ export async function updateUser (req, res) {
 
 export async function uploadUserFile(req, res) {
     try {
-        const { id, type } = req.params; // "profile" or "resume"
+        const { id, type } = req.params;
 
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
 
-        // Only allow valid fields
         const allowedTypes = ["profile", "resume"];
         if (!allowedTypes.includes(type)) {
             return res.status(400).json({ error: "Invalid upload type" });
@@ -89,9 +88,13 @@ export async function uploadUserFile(req, res) {
 
         const filePath = `/uploads/${req.file.filename}`;
 
-        const update = { [type]: filePath };
+        const update = { [type === "resume" ? "resume_cv" : type]: filePath };
 
-        const updatedUser = await User.findByIdAndUpdate(id, update, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(
+            id, 
+            update, 
+            { new: true }
+        );
 
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
@@ -99,6 +102,7 @@ export async function uploadUserFile(req, res) {
 
         res.status(200).json({
             message: `${type} uploaded successfully`,
+            filePath: filePath,
             [type]: filePath
         });
 
@@ -117,16 +121,20 @@ export async function deleteUserFile(req, res) {
             return res.status(400).json({ error: "Invalid delete type" });
         }
 
-        const update = { [type]: "" };
+        const update = { [type === "resume" ? "resume" : type]: "" };
 
-        const updatedUser = await User.findByIdAndUpdate(id, update, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(
+            id, 
+            update, 
+            { new: true }
+        );
 
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
         res.status(200).json({
-            message: `${type} deleted`,
+            message: `${type} deleted successfully`,
             [type]: ""
         });
 
