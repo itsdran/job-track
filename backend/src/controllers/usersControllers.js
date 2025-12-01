@@ -73,52 +73,65 @@ export async function updateUser (req, res) {
     }
 }
 
-export async function updateProfilePicture(req, res) {
+export async function uploadUserFile(req, res) {
     try {
+        const { id, type } = req.params; // "profile" or "resume"
+
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
 
-        const profile = `/uploads/${req.file.filename}`;
+        // Only allow valid fields
+        const allowedTypes = ["profile", "resume"];
+        if (!allowedTypes.includes(type)) {
+            return res.status(400).json({ error: "Invalid upload type" });
+        }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            { profile },
-            { new: true }
-        );
+        const filePath = `/uploads/${req.file.filename}`;
+
+        const update = { [type]: filePath };
+
+        const updatedUser = await User.findByIdAndUpdate(id, update, { new: true });
 
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
         res.status(200).json({
-            message: "Profile picture updated",
-            profile  // Return the path, frontend will normalize it
+            message: `${type} uploaded successfully`,
+            [type]: filePath
         });
+
     } catch (error) {
-        console.error("Error updating profile picture:", error);
+        console.error(`Error uploading ${req.params.type}:`, error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
 
-export async function deleteProfilePicture(req, res) {
+export async function deleteUserFile(req, res) {
     try {
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            { profile: "" },  
-            { new: true }
-        );
+        const { id, type } = req.params;
+
+        const allowedTypes = ["profile", "resume"];
+        if (!allowedTypes.includes(type)) {
+            return res.status(400).json({ error: "Invalid delete type" });
+        }
+
+        const update = { [type]: "" };
+
+        const updatedUser = await User.findByIdAndUpdate(id, update, { new: true });
 
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        res.status(200).json({ 
-            message: "Profile picture deleted",
-            profile: ""  // Return empty string for consistency
+        res.status(200).json({
+            message: `${type} deleted`,
+            [type]: ""
         });
+
     } catch (error) {
-        console.error("Error deleting profile picture:", error);
+        console.error(`Error deleting ${req.params.type}:`, error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 }

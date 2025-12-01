@@ -26,7 +26,8 @@ const SignupPage = () => {
         skills: '',
         portfolio_link: '',
         linkedin_link: '',
-        resume_cv: null
+        profile: '',
+        resume_cv: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -39,14 +40,6 @@ const SignupPage = () => {
         setFormData(prev => ({
         ...prev,
         [name]: value
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFormData(prev => ({
-        ...prev,
-        resume: file
         }));
     };
 
@@ -305,9 +298,21 @@ const SignupPage = () => {
                                     <span className="label-text font-semibold">
                                         <Upload className="inline mr-1" size={16} />Upload Resume/CV</span>
                                 </label>
-                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
+                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" name="resume_cv" onChange={handleChange} />
                                 <label className="label">
                                     <span className="label-text-alt">Accepted formats: PDF, DOC, DOCX</span>
+                                </label>
+                            </div>
+
+                            {/* Profile Upload */}
+                            <div className="form-control mb-6">
+                                <label className="label">
+                                    <span className="label-text font-semibold">
+                                        <Upload className="inline mr-1" size={16} />Upload Profile Picture</span>
+                                </label>
+                                <input type="file" className="file-input file-input-bordered w-full" accept=".jpg,.jpeg,.png" name="profile" onChange={handleChange} />
+                                <label className="label">
+                                    <span className="label-text-alt">Accepted formats: JPG, JPEG, PNG</span>
                                 </label>
                             </div>
 

@@ -43,7 +43,7 @@ const ProfilePage = () => {
         profile: ''
     });
 
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
     const normalizeProfileUrl = (profilePath) => {
@@ -84,58 +84,59 @@ const ProfilePage = () => {
         fetchUserData();
     }, [user._id, isAuthenticated, logout]);
 
-    const handleImageChange = (e) => {
+    const handleFileChange = (e, type) => {
         const file = e.target.files[0];
-        if (file) {
-            setSelectedImage(file);
+        if (!file) return;
+
+        if (type === "profile") {
             setImagePreview(URL.createObjectURL(file));
         }
+
+        setSelectedFile({ file, type }); // store both
     };
 
-    const handleImageUpload = async () => {
-        if (!selectedImage) {
-            toast.error('Please select an image first');
+    const handleFileUpload = async (file, type) => {
+        if (!file) {
+            toast.error(`Please select a ${type} first`);
             return;
         }
 
         const formData = new FormData();
-        formData.append('profile', selectedImage);
+        formData.append(type, file);
 
         try {
-            const res = await api.put(`/users/${user._id}/profile-picture`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            const res = await api.put(`/users/${user._id}/${type}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
             });
-            
-            console.log('Upload response:', res.data);
-            const profileUrl = normalizeProfileUrl(res.data.profile);
-            console.log('Normalized URL:', profileUrl);
-            
-            setUserData(prev => ({ ...prev, profile: profileUrl }));
-            setImagePreview(null);
-            setSelectedImage(null);
-            toast.success('Profile picture updated!');
+
+            const normalized = normalizeProfileUrl(res.data[type]);
+            setUserData(prev => ({ ...prev, [type]: normalized }));
+
+            toast.success(`${type === "profile" ? "Profile picture" : "Resume"} updated!`);
         } catch (error) {
-            toast.error('Error uploading image');
-            console.error('Upload error details:', error.response?.data);
+            toast.error(`Error uploading ${type}`);
+            console.error(`Upload ${type} error:`, error.response?.data);
         }
     };
 
-    const handleImageDelete = async () => {
-        if (!window.confirm('Are you sure you want to delete your profile picture?')) {
-            return;
-        }
-        
+    const handleFileDelete = async (type) => {
+        if (!window.confirm(`Delete your ${type}?`)) return;
+
         try {
-            await api.delete(`/users/${user._id}/profile-picture`);
-            setUserData(prev => ({ ...prev, profile: defaultAvatar }));
-            setImagePreview(null);
-            setSelectedImage(null);
-            toast.success('Profile picture deleted!');
+            await api.delete(`/users/${user._id}/${type}`);
+
+            setUserData(prev => ({
+                ...prev,
+                [type]: type === "profile" ? defaultAvatar : null
+            }));
+
+            toast.success(`${type} deleted!`);
         } catch (error) {
-            toast.error('Error deleting image');
-            console.error('Delete error:', error);
+            toast.error(`Error deleting ${type}`);
+            console.error(`Delete ${type} error:`, error);
         }
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -185,7 +186,7 @@ const ProfilePage = () => {
 
     const handleViewResume = () => {
         if (userData?.resume_cv) window.open(userData.resume_cv, '_blank');
-    };
+    }
     
     if (loading) {
         return (<div className="flex justify-center items-center min-h-screen"><span className="loading loading-spinner loading-lg"></span></div>);
@@ -233,15 +234,15 @@ const ProfilePage = () => {
                                             </div>
                                             {isEditing && (
                                                 <div className="mt-3 flex flex-col gap-2">
-                                                    <input type="file" accept="image/*" onChange={handleImageChange} className="file-input file-input-bordered file-input-xs w-full max-w-xs" />
-                                                    {selectedImage && (
-                                                        <button onClick={handleImageUpload} className="btn btn-success btn-xs">
+                                                    <input type="file" accept="image/*" onChange={() => handleFileChange(selectedFile.file, selectedFile.type)} className="file-input file-input-bordered file-input-xs w-full max-w-xs" />
+                                                    {selectedFile && (
+                                                        <button onClick={() => handleFileUpload(selectedFile.file, selectedFile.type)} className="btn btn-success btn-xs">
                                                             <Upload size={14} />
                                                             Upload
                                                         </button>
                                                     )}
                                                     {userData.profile && userData.profile !== defaultAvatar && (
-                                                        <button onClick={handleImageDelete} className="btn btn-error btn-xs">
+                                                        <button onClick={() => handleFileDelete("profile")} className="btn btn-error btn-xs">
                                                             <Trash2 size={14} />
                                                             Delete Picture
                                                         </button>
@@ -388,7 +389,7 @@ const ProfilePage = () => {
                                             </div>
                                         </div>
                                     </div>
-
+                                    
                                     {userData.resume_cv && (
                                     <div className="alert alert-info">
                                         <FileText size={24} />
@@ -396,7 +397,15 @@ const ProfilePage = () => {
                                             <h3 className="font-bold">Resume on File</h3>
                                             <div className="text-xs">Your resume is stored and ready to be viewed or downloaded</div>
                                         </div>
-                                        <button onClick={handleViewResume} className="btn btn-sm btn-primary">View</button>
+                                        { isEditing ? (
+                                            <>
+                                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" 
+                                                    name="resume_cv" onChange={(e) => handleFileChange(e, "profile")} />
+                                                <button onClick={() => handleFileDelete("resume")} className="btn btn-error btn-sm gap-2"><Trash2 size={16} />Delete</button>
+                                            </>
+                                        ) : (
+                                            <button onClick={handleViewResume} className="btn btn-sm btn-primary">View</button>
+                                        )}
                                     </div>
                                     )}
                                 </div>
