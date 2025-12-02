@@ -73,6 +73,10 @@ export async function updateUser (req, res) {
 }
 
 export async function uploadUserFile(req, res) {
+
+    console.log("UPLOAD ROUTE HIT:", req.params);
+    console.log("FILE RECEIVED:", req.file?.filename);
+
     try {
         const { id, type } = req.params;
 

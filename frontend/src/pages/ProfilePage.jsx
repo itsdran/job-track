@@ -9,6 +9,7 @@ import { formatDate } from '../lib/utils.js';
 import { setups } from '../constants/setups.js';
 
 import api from '../lib/axios';
+import dotenv from "dotenv";
 
 import RateLimitedUI from '../components/RateLimited.jsx';
 

@@ -13,7 +13,6 @@ import { Toaster } from 'react-hot-toast';
 
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
-
 function App() {
   return (
     <>
