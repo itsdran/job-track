@@ -8,8 +8,7 @@ import { AuthContext } from './AuthContext';
 import { formatDate } from '../lib/utils.js';
 import { setups } from '../constants/setups.js';
 
-import api from '../lib/axios';
-import dotenv from "dotenv";
+import api, { BASE_URL } from '../lib/axios';
 
 import RateLimitedUI from '../components/RateLimited.jsx';
 
@@ -53,7 +52,7 @@ const ProfilePage = () => {
             return;
         }
         document.title = `Profile`;
-
+        
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
@@ -187,7 +186,7 @@ const ProfilePage = () => {
     };
 
     const handleViewResume = () => {
-        if (userData?.resume) window.open(userData.resume, '_blank');
+        if (userData?.resume) window.open(`${BASE_URL}${userData.resume}`, '_blank');
     };
     
     if (loading) {
@@ -228,7 +227,7 @@ const ProfilePage = () => {
                                     <div className="flex-shrink-0">
                                         <div className="avatar">
                                             <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                                <img src={userData.profile || imagePreview || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
+                                                <img src={`${BASE_URL}${userData.profile}` || imagePreview || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
                                             </div>
                                         </div>
                                         {isEditing && (
