@@ -27,7 +27,7 @@ const SignupPage = () => {
         portfolio_link: '',
         linkedin_link: '',
         profile: '',
-        resume_cv: ''
+        resume: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -298,7 +298,7 @@ const SignupPage = () => {
                                     <span className="label-text font-semibold">
                                         <Upload className="inline mr-1" size={16} />Upload Resume/CV</span>
                                 </label>
-                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" name="resume_cv" onChange={handleChange} />
+                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" name="resume" onChange={handleChange} />
                                 <label className="label">
                                     <span className="label-text-alt">Accepted formats: PDF, DOC, DOCX</span>
                                 </label>

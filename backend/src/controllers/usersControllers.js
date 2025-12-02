@@ -38,7 +38,7 @@ export async function updateUser (req, res) {
     try {
         const { first_name, last_name, email, username, phone_number, job_applying_for, location_preference, 
             setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
-            resume_cv, profile } = req.body;
+            resume, profile } = req.body;
 
         // Check for duplicates BUT exclude the current user
         const isDuplicate = await User.findOne({
@@ -50,13 +50,12 @@ export async function updateUser (req, res) {
             return res.status(400).json({ error: "Email or username already exists" });
         }
 
-        // Don't allow username/email changes, so no duplicate check needed
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id, 
             {   
                 first_name, last_name, phone_number, job_applying_for, location_preference, 
                 setup_preference, salary_expectation, profile_summary, skills, portfolio_link, linkedin_link, 
-                resume_cv, profile 
+                resume, profile 
             },
             { new: true }
         );
@@ -88,7 +87,7 @@ export async function uploadUserFile(req, res) {
 
         const filePath = `/uploads/${req.file.filename}`;
 
-        const update = { [type === "resume" ? "resume_cv" : type]: filePath };
+        const update = { [type]: filePath };
 
         const updatedUser = await User.findByIdAndUpdate(
             id, 
@@ -102,7 +101,6 @@ export async function uploadUserFile(req, res) {
 
         res.status(200).json({
             message: `${type} uploaded successfully`,
-            filePath: filePath,
             [type]: filePath
         });
 
@@ -121,7 +119,7 @@ export async function deleteUserFile(req, res) {
             return res.status(400).json({ error: "Invalid delete type" });
         }
 
-        const update = { [type === "resume" ? "resume" : type]: "" };
+        const update = { [type]: "" };
 
         const updatedUser = await User.findByIdAndUpdate(
             id, 

@@ -45,12 +45,6 @@ const ProfilePage = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedResume, setSelectedResume] = useState(null);
 
-    const normalizeProfileUrl = (profilePath) => {
-        if (!profilePath || profilePath === "") return defaultAvatar;
-        if (profilePath.startsWith('/uploads/')) return `http://localhost:5001${profilePath}`;
-        return profilePath;
-    };
-
     useEffect(() => {
         if (isAuthenticated === false) {
             toast.error("Log in first!");
@@ -62,10 +56,6 @@ const ProfilePage = () => {
         const fetchUserData = async () => {
             try {
                 const res = await api.get(`/users/${user.username}`);
-                res.data.profile = normalizeProfileUrl(res.data.profile);
-                if (res.data.resume && res.data.resume.startsWith('/uploads/')) {
-                    res.data.resume = `http://localhost:5001${res.data.resume}`;
-                }
                 setUserData(res.data);
                 setIsRateLimited(false);
             } catch (error) {
@@ -82,18 +72,13 @@ const ProfilePage = () => {
         fetchUserData();
     }, [user._id, isAuthenticated, logout]);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedImage(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
-    };
-
-    const handleResumeChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedResume(file);
+    const handleFileChange = (e, setFile, setPreview) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            if (setPreview) {
+                setPreview(selectedFile);
+            }
         }
     };
 
@@ -105,17 +90,15 @@ const ProfilePage = () => {
 
         const formData = new FormData();
         formData.append('file', file);
-
+        
         try {
             const res = await api.put(`/users/${user._id}/${type}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            // Handle response
-            const fieldName = type === 'resume' ? 'resume' : type;
-            const fileUrl = normalizeProfileUrl(res.data[type] || res.data.filePath);
+            const fileUrl = res.data.filePath || res.data[type];
             
-            setUserData(prev => ({ ...prev, [fieldName]: fileUrl }));
+            setUserData(prev => ({ ...prev, [type]: fileUrl }));
             
             if (setSelectedFile) setSelectedFile(null);
             if (setPreview) setPreview(null);
@@ -135,10 +118,9 @@ const ProfilePage = () => {
         try {
             await api.delete(`/users/${user._id}/${type}`);
             
-            const fieldName = type === 'resume' ? 'resume' : type;
             const defaultValue = type === 'profile' ? defaultAvatar : '';
             
-            setUserData(prev => ({ ...prev, [fieldName]: defaultValue }));
+            setUserData(prev => ({ ...prev, [type]: defaultValue }));
             if (setSelectedFile) setSelectedFile(null);
             if (setPreview) setPreview(null);
             
@@ -151,6 +133,9 @@ const ProfilePage = () => {
 
     const handleImageUpload = () => handleFileUpload('profile', selectedImage, setSelectedImage, setImagePreview);
     const handleResumeUpload = () => handleFileUpload('resume', selectedResume, setSelectedResume);
+
+    const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
+    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null)
 
     const handleImageDelete = () => handleFileDelete('profile', setSelectedImage, setImagePreview);
     const handleResumeDelete = () => handleFileDelete('resume', setSelectedResume);
@@ -187,7 +172,7 @@ const ProfilePage = () => {
         setSelectedResume(null);
     };
 
-    const handleDelete = async () => {
+    const handleDeleteAccount = async () => {
         if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
             try {
                 await api.delete(`/users/${user._id}`);
@@ -232,7 +217,7 @@ const ProfilePage = () => {
                                 {userData.resume && (<button onClick={handleViewResume} className="btn btn-info btn-sm gap-2"><Download size={16} />View Resume</button>)}
                                 {isEditing && (<button onClick={handleCancel} className="btn btn-neutral btn-sm gap-2"><X size={16} />Cancel</button>)}
                                 <button onClick={handleUpdate} className="btn btn-warning btn-sm gap-2">{isEditing ? <><Save size={16} />Save Update</> : <><Edit size={16} />Update</>}</button>
-                                <button onClick={handleDelete} className="btn btn-error btn-sm gap-2"><Trash2 size={16} />Delete</button>
+                                <button onClick={handleDeleteAccount} className="btn btn-error btn-sm gap-2"><Trash2 size={16} />Delete Account</button>
                             </div>
                         </div>
 
@@ -242,7 +227,7 @@ const ProfilePage = () => {
                                     <div className="flex-shrink-0">
                                         <div className="avatar">
                                             <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                                <img src={imagePreview || userData.profile} alt={`${userData.first_name} ${userData.last_name}`} />
+                                                <img src={userData.profile || imagePreview || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
                                             </div>
                                         </div>
                                         {isEditing && (
