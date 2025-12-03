@@ -9,7 +9,7 @@ import { getAllJobsFromUserID } from "../controllers/jobsControllers.js";
 const router = express.Router();
 
 router.get("/", getAllUsers); // testing purpose only
-router.get("/:username", getUserByUN);
+router.get("/:identifier", getUserByUN);
 router.get("/:id", getUserByID);
 router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);

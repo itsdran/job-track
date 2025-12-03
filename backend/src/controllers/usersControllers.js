@@ -25,9 +25,14 @@ export async function getUserByID (req, res) {
 
 export async function getUserByUN(req, res) {
     try {
-        const user = await User.findOne({ username: req.params.username });
+        const { identifier } = req.params;
+
+        const user = await User.findOne({ 
+            $or: [{ email: identifier }, { username: identifier }] 
+        }); 
+
         if (!user) return res.status(404).json({ message: "User not found" });
-        res.status(200).json(user);
+        return res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user account by username:", error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -73,10 +78,6 @@ export async function updateUser (req, res) {
 }
 
 export async function uploadUserFile(req, res) {
-
-    console.log("UPLOAD ROUTE HIT:", req.params);
-    console.log("FILE RECEIVED:", req.file?.filename);
-
     try {
         const { id, type } = req.params;
 

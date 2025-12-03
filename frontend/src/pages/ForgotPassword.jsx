@@ -20,7 +20,8 @@ const ForgotPasswordPage = () => {
         setLoading(true);
 
         try {
-            const res = await api.post(`/auth/${identifier}`);
+            const res = await api.post(`/auth/forgot-password`, { identifier } );
+            if (!res) toast.error('No account found!');
 
             setEmailSent(true);
 

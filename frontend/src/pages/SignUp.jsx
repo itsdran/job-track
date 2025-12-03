@@ -72,7 +72,7 @@ const SignupPage = () => {
                 toast.error("Email or Username is already taken");
             else
                 toast.success('Account created successfully! You can now log in.');
-                navigate('/login');
+                navigate('/auth/login');
         } catch (error) {
             toast.error('Error creating account. Please try again.');
             console.error('Signup error:', error);
@@ -337,7 +337,7 @@ const SignupPage = () => {
                             <div className="text-center mt-6">
                                 <p className="text-base-content/70">
                                 Already have an account?{' '}
-                                <a href="/login" className="link link-primary font-semibold">Log in</a>
+                                <a href="/auth/login" className="link link-primary font-semibold">Log in</a>
                                 </p>
                             </div>
                         </div>

@@ -80,10 +80,17 @@ const userSchema = new moose.Schema(
         isActive: {
             type: Boolean,
             default: true
+        },
+        resetPasswordToken: {
+            type: String,
+            default: undefined
+        },
+        resetPasswordExpire: {
+            type: Date,
+            default: undefined
         }
     },
-
-    { timestamps: true }
+        { timestamps: true }
     );
 
 const User = moose.model('User', userSchema);

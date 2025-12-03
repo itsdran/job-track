@@ -43,7 +43,7 @@ const LoginPage = () => {
             const res = await axios.post("/auth/login", formData);
 
             if (!res)  
-              toast.success('No account found!');
+              toast.error('No account found!');
 
             login(res.data.user, res.data.token);
 
@@ -79,7 +79,7 @@ const LoginPage = () => {
                 <input type={showPassword ? "text" : "password"} name="password" placeholder="••••••••" className="input input-bordered input-lg w-full pr-12" value={formData.password} onChange={handleChange} required />
                 <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 btn btn-ghost btn-sm btn-circle" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}</button>
               </div>
-              <label className="label"><a href="/forgot-password" className="label-text-alt link link-hover link-primary">Forgot password?</a></label>
+              <label className="label"><a href="/auth/forgot-password" className="label-text-alt link link-hover link-primary">Forgot password?</a></label>
             </div>
 
             <button type="button" className="btn btn-primary btn-lg w-full mb-4" onClick={handleSubmit} disabled={loading}>
@@ -89,13 +89,13 @@ const LoginPage = () => {
             <div className="divider">OR</div>
 
             <div className="text-center">
-              <p className="text-base-content/70">Don't have an account? <a href="/signup" className="link link-primary font-semibold">Sign up here</a></p>
+              <p className="text-base-content/70">Don't have an account? <a href="/auth/signup" className="link link-primary font-semibold">Sign up here</a></p>
             </div>
           </div>
         </div>
 
         <div className="text-center mt-6">
-          <p className="text-sm text-base-content/60">By signing in, you agree to our <a href="/terms" className="link link-hover">Terms of Service</a> and <a href="/privacy" className="link link-hover">Privacy Policy</a></p>
+          <p className="text-sm text-base-content/60">By signing in, you agree to our <a href="/" className="link link-hover">Terms of Service</a> and <a href="/privacy" className="link link-hover">Privacy Policy</a></p>
         </div>
       </div>
     </div>
