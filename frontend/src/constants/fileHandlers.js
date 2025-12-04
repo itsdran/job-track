@@ -1,4 +1,3 @@
-import toast from "react-hot-toast";
 import api from "../lib/axios";
 
 export const handleFileChange = (e, setFile, setPreview) => {
@@ -32,10 +31,8 @@ export const handleFileUpload = async ({ type, file, userId, setUserData, setSel
         if (setSelectedFile) setSelectedFile(null);
         if (setPreview) setPreview(null);
 
-        toast.success(`${type.toUpperCase()} updated!`);
     } catch (error) {
         console.error("Upload error:", error);
-        toast.error(`Error uploading ${type}`);
     }
 };
 

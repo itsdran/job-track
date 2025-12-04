@@ -116,7 +116,7 @@ const ResetPasswordPage = () => {
                     </button>
                 </div>
                 <label className="label">
-                    <span className="label-text-alt">Minimum 8 characters</span>
+                    <span className="label-text-alt">Must be at least 12 characters containing upper and lower cases, a number, and a symbol</span>
                 </label>
                 </div>
 

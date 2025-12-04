@@ -72,8 +72,8 @@ const ProfilePage = () => {
         fetchUserData();
     }, [user._id, isAuthenticated, logout]);
     
-    const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
-    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null);
+    const handleImageChange = (e) => handleFileChange({ e, setFile: setSelectedImage, setPreview: setImagePreview });
+    const handleResumeChange = (e) => handleFileChange({ e, setFile: setSelectedResume, setPreview: null} );
 
     // Upload handlers
     const handleImageUpload = () => handleFileUpload({ type: 'profile', file: selectedImage, userId: user._id, 
@@ -127,7 +127,7 @@ const ProfilePage = () => {
                 await api.delete(`/users/${user._id}`);
                 toast.success("Account deleted successfully. Redirecting...");
                 logout();
-                navigate("/");
+                navigate("/auth/login");
             } catch (error) {
                 toast.error('Error deleting account');
             }
