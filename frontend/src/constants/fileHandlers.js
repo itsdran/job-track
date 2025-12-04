@@ -4,9 +4,7 @@ export const handleFileChange = (e, setFile, setPreview) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
         setFile(selectedFile);
-        if (setPreview) {
-            setPreview(selectedFile);
-        }
+        setPreview(selectedFile);
     }
 };
 

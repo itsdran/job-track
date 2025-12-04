@@ -72,8 +72,8 @@ const ProfilePage = () => {
         fetchUserData();
     }, [user._id, isAuthenticated, logout]);
     
-    const handleImageChange = (e) => handleFileChange({ e, setFile: setSelectedImage, setPreview: setImagePreview });
-    const handleResumeChange = (e) => handleFileChange({ e, setFile: setSelectedResume, setPreview: null} );
+    const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
+    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null);
 
     // Upload handlers
     const handleImageUpload = () => handleFileUpload({ type: 'profile', file: selectedImage, userId: user._id, 
@@ -176,7 +176,7 @@ const ProfilePage = () => {
                                     <div className="flex-shrink-0">
                                         <div className="avatar">
                                             <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                                <img src={`${BASE_URL}${userData.profile}` || imagePreview || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
+                                                <img src={`${BASE_URL}${userData.profile}` || selectedImage || defaultAvatar} alt={`${userData.first_name} ${userData.last_name}`} />
                                             </div>
                                         </div>
                                         {isEditing && (
