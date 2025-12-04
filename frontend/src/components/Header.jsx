@@ -71,12 +71,12 @@ export const Header = () => {
                         ) : (
                         <>
                             <li>
-                                <button onClick={() => handleNavigation('/login')}>
+                                <button onClick={() => handleNavigation('auth/login')}>
                                     <LogIn size={16} /> Log In
                                 </button>
                             </li>
                             <li>
-                                <button onClick={() => handleNavigation('/signup')}>
+                                <button onClick={() => handleNavigation('auth/signup')}>
                                     <UserPlus size={16} /> Sign Up
                                 </button>
                             </li>

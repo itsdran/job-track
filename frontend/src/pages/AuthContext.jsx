@@ -11,8 +11,7 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem("token");
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const storedFirstName = localStorage.getItem("first_name");
-        if (storedToken) 
-        if (storedUser) 
+
         if (storedToken && storedUser && storedFirstName) {
             setToken(storedToken);
             setUser(storedUser);

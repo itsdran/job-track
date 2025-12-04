@@ -36,11 +36,11 @@ export async function signUpUser (req, res) {
             resume_cv, profile: profilePicUrl } );
 
         await newUser.save();
-        res.status(201).json({message: "Account created successfully"});
+        res.status(201).json({message: "Account created successfully", _id : newUser._id });
 
     } catch (error) {
         console.error("Error creating account:", error);
-        res.status(500).json({ error: "Internal Server Error" });        
+        res.status(500).json({ error: "Internal Server Error"});        
     }
 } 
 

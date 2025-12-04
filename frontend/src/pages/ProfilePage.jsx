@@ -2,12 +2,12 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {    User, Mail, Phone, MapPin, Briefcase, PhilippinePeso, FileText, Code, ExternalLink, Linkedin, 
             Calendar, Edit, Trash2, Download, Laptop, ArrowLeft, Save, Plus, Upload, X } from 'lucide-react';
-import defaultAvatar from '../avatars/avatar.svg';
 
-import { AuthContext } from './AuthContext';
+import defaultAvatar from '../avatars/avatar.svg';
+import { handleFileChange, handleFileUpload, handleFileDelete} from '../constants/fileHandlers.js'
 import { formatDate } from '../lib/utils.js';
 import { setups } from '../constants/setups.js';
-
+import { AuthContext } from './AuthContext';
 import api, { BASE_URL } from '../lib/axios';
 
 import RateLimitedUI from '../components/RateLimited.jsx';
@@ -71,74 +71,23 @@ const ProfilePage = () => {
         };
         fetchUserData();
     }, [user._id, isAuthenticated, logout]);
-
-    const handleFileChange = (e, setFile, setPreview) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-            if (setPreview) {
-                setPreview(selectedFile);
-            }
-        }
-    };
-
-    const handleFileUpload = async (type, file, setSelectedFile, setPreview) => {
-        if (!file) {
-            toast.error(`Please select a ${type} first`);
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        try {
-            const res = await api.put(`/users/${user._id}/${type}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            
-            const fileUrl = res.data.filePath || res.data[type];
-            
-            setUserData(prev => ({ ...prev, [type]: fileUrl }));
-            
-            if (setSelectedFile) setSelectedFile(null);
-            if (setPreview) setPreview(null);
-            
-            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} updated!`);
-        } catch (error) {
-            toast.error(`Error uploading ${type}`);
-            console.error('Upload error:', error);
-        }
-    };
-
-    const handleFileDelete = async (type, setSelectedFile, setPreview) => {
-        if (!window.confirm(`Are you sure you want to delete your ${type}?`)) {
-            return;
-        }
-        
-        try {
-            await api.delete(`/users/${user._id}/${type}`);
-            
-            const defaultValue = type === 'profile' ? defaultAvatar : '';
-            
-            setUserData(prev => ({ ...prev, [type]: defaultValue }));
-            if (setSelectedFile) setSelectedFile(null);
-            if (setPreview) setPreview(null);
-            
-            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted!`);
-        } catch (error) {
-            toast.error(`Error deleting ${type}`);
-            console.error('Delete error:', error);
-        }
-    };
-
-    const handleImageUpload = () => handleFileUpload('profile', selectedImage, setSelectedImage, setImagePreview);
-    const handleResumeUpload = () => handleFileUpload('resume', selectedResume, setSelectedResume);
-
+    
     const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
-    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null)
+    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null);
 
-    const handleImageDelete = () => handleFileDelete('profile', setSelectedImage, setImagePreview);
-    const handleResumeDelete = () => handleFileDelete('resume', setSelectedResume);
+    // Upload handlers
+    const handleImageUpload = () => handleFileUpload({ type: 'profile', file: selectedImage, userId: user._id, 
+        setUserData, setSelectedFile: setSelectedImage, setPreview: setImagePreview});
+
+    const handleResumeUpload = () => handleFileUpload({ type: 'resume', file: selectedResume, userId: user._id,
+        setUserData, setSelectedFile: setSelectedResume, setPreview: null });
+
+    // Delete handlers
+    const handleImageDelete = () => handleFileDelete({ type: 'profile', userId: user._id, setUserData,
+        setSelectedFile: setSelectedImage, setPreview: setImagePreview, defaultAvatar });
+
+    const handleResumeDelete = () => handleFileDelete({ type: 'resume', userId: user._id, setUserData,
+        setSelectedFile: setSelectedResume, setPreview: null });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -178,7 +127,7 @@ const ProfilePage = () => {
                 await api.delete(`/users/${user._id}`);
                 toast.success("Account deleted successfully. Redirecting...");
                 logout();
-                navigate("/home");
+                navigate("/");
             } catch (error) {
                 toast.error('Error deleting account');
             }

@@ -4,6 +4,8 @@ import { User as UserIcon, Mail, Lock, Laptop, MapPin, Briefcase, Code, External
 import { toast } from 'react-hot-toast';
 
 import { setups } from '../constants/setups';
+import { handleFileChange, handleFileUpload } from '../constants/fileHandlers.js'
+
 import axios from '../lib/axios';
 
 const SignupPage = () => {
@@ -43,6 +45,14 @@ const SignupPage = () => {
         }));
     };
 
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedResume, setSelectedResume] = useState(null);
+
+    const [imagePreview, setImagePreview] = useState(null);
+
+    const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
+    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null);
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -68,11 +78,23 @@ const SignupPage = () => {
 
         try {
             const res = await axios.post("auth/signup", formData);
-            if (res.data.exists) 
+            console.log(res);
+            if (res.data.exists)  {
                 toast.error("Email or Username is already taken");
-            else
+            } else {
+                // Upload handlers
+                const handleImageUpload = () => handleFileUpload({ type: 'profile', file: selectedImage, userId: res.data._id, 
+                    setUserData: setFormData, setSelectedFile: setSelectedImage, setPreview: setImagePreview});
+
+                const handleResumeUpload = () => handleFileUpload({ type: 'resume', file: selectedResume, userId: res.data._id,
+                    setUserData: setFormData, setSelectedFile: setSelectedResume, setPreview: null });
+
+                await handleImageUpload();
+                await handleResumeUpload();            
                 toast.success('Account created successfully! You can now log in.');
                 navigate('/auth/login');
+            }
+
         } catch (error) {
             toast.error('Error creating account. Please try again.');
             console.error('Signup error:', error);
@@ -298,7 +320,7 @@ const SignupPage = () => {
                                     <span className="label-text font-semibold">
                                         <Upload className="inline mr-1" size={16} />Upload Resume/CV</span>
                                 </label>
-                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" name="resume" onChange={handleChange} />
+                                <input type="file" className="file-input file-input-bordered w-full" accept=".pdf,.doc,.docx" name="resume" onChange={handleResumeChange} />
                                 <label className="label">
                                     <span className="label-text-alt">Accepted formats: PDF, DOC, DOCX</span>
                                 </label>
@@ -310,7 +332,7 @@ const SignupPage = () => {
                                     <span className="label-text font-semibold">
                                         <Upload className="inline mr-1" size={16} />Upload Profile Picture</span>
                                 </label>
-                                <input type="file" className="file-input file-input-bordered w-full" accept=".jpg,.jpeg,.png" name="profile" onChange={handleChange} />
+                                <input type="file" className="file-input file-input-bordered w-full" accept=".jpg,.jpeg,.png" name="profile" onChange={handleImageChange} />
                                 <label className="label">
                                     <span className="label-text-alt">Accepted formats: JPG, JPEG, PNG</span>
                                 </label>

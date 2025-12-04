@@ -40,11 +40,11 @@ const HomePage = () => {
                         </div>
                     ): (
                         <div className="flex gap-4 justify-center flex-wrap">
-                            <button onClick={() => handleNavigation('/login')} className="btn btn-primary btn-lg gap-2">
+                            <button onClick={() => handleNavigation('auth/login')} className="btn btn-primary btn-lg gap-2">
                                 <LogIn size={24} />
                                 Log In
                             </button>
-                            <button onClick={() => handleNavigation('/signup')} className="btn btn-outline btn-lg gap-2">
+                            <button onClick={() => handleNavigation('auth/signup')} className="btn btn-outline btn-lg gap-2">
                                 <UserPlus size={24} />
                                 Sign Up
                             </button>
