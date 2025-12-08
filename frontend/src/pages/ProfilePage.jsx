@@ -44,6 +44,7 @@ const ProfilePage = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedResume, setSelectedResume] = useState(null);
+    const [resumePreview, setResumePreview] = useState(null);
 
     useEffect(() => {
         if (isAuthenticated === false) {
@@ -73,14 +74,14 @@ const ProfilePage = () => {
     }, [user._id, isAuthenticated, logout]);
     
     const handleImageChange = (e) => handleFileChange(e, setSelectedImage, setImagePreview);
-    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, null);
+    const handleResumeChange = (e) => handleFileChange(e, setSelectedResume, setResumePreview);
 
     // Upload handlers
     const handleImageUpload = () => handleFileUpload({ type: 'profile', file: selectedImage, userId: user._id, 
         setUserData, setSelectedFile: setSelectedImage, setPreview: setImagePreview});
 
     const handleResumeUpload = () => handleFileUpload({ type: 'resume', file: selectedResume, userId: user._id,
-        setUserData, setSelectedFile: setSelectedResume, setPreview: null });
+        setUserData, setSelectedFile: setSelectedResume, setPreview: setResumePreview });
 
     // Delete handlers
     const handleImageDelete = () => handleFileDelete({ type: 'profile', userId: user._id, setUserData,
